@@ -1,0 +1,34 @@
+[user]
+    name = Jens-André Koch
+    email = jakoch@web.de
+
+[github]
+    user = jakoch
+    token = @token@
+
+[color]
+    diff = auto
+    status = auto
+    branch = auto
+    ui = auto
+
+[alias]
+    st = status
+    ci = commit
+    br = branch
+    co = checkout
+    df = diff
+
+# always set `origin` as the default remote on the `master` branch
+[branch "master"]
+    remote = origin
+    merge = refs/heads/master
+
+# anti whitespace
+[core]
+    # enforce "trailing-spaces" and "mixing spaces with tabs" as errors
+    # To get rid of trailing whitespace on all files in the current directory, use: sed -i 's/[[:space:]]*$//' *
+    whitespace = trailing-space,
+[apply]
+    # when applying a patch, strip whitespaces out
+    whitespace = fix
