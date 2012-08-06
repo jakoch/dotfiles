@@ -1,3 +1,5 @@
+# http://www.kernel.org/pub/software/scm/git/docs/git-config.html
+
 [user]
     name = Jens-André Koch
     email = jakoch@web.de
@@ -42,16 +44,16 @@
     merge = refs/heads/master
 
 [push]
-  default = tracking
+    default = tracking
 
 [format]
-  pretty = %Cblue%h%Creset %Cgreen[%ar]%Creset (%an) %s
+    pretty = %Cblue%h%Creset %Cgreen[%ar]%Creset (%an) %s
 
-# anti whitespace
+# anti whitespace / anti tab
 [core]
     # enforce "trailing-spaces" and "mixing spaces with tabs" as errors
     # To get rid of trailing whitespace on all files in the current directory, use: sed -i 's/[[:space:]]*$//' *
-    whitespace = trailing-space,
+    whitespace =  trailing-space,space-before-tab,cr-at-eol,tab-in-indent
 [apply]
     # when applying a patch, strip whitespaces out
     whitespace = fix
