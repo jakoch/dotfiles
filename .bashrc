@@ -120,6 +120,7 @@ function ii() {
     echo -e "\n${light_red}Users logged on:${nocolor} " ; w -h
     echo -e "\n${light_red}Machine stats :${nocolor} " ; uptime
     echo -e "\n${light_red}Memory stats :${nocolor} " ; free -m
+    echo -e "\n${light_red}Disk stats :${nocolor} " ; df -h
     for my_if in $MY_IF; do
     echo -e "\n${light_red}Interface $my_if :${nocolor}" ;
         /sbin/ifconfig $my_if | awk '/inet / { print $2 } ' | cut -d ":" -f 2
