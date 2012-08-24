@@ -38,6 +38,9 @@
     branches = branch -a
     remotes = remote -v
 
+    # enhanced log view
+    lg = git log --graph --pretty="format:%C(yellow)%h%Cblue%d%Creset %s %C(white) %an, %ar%Creset"
+
 # always set `origin` as the default remote on the `master` branch
 [branch "master"]
     remote = origin
