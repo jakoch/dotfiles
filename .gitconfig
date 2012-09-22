@@ -41,6 +41,11 @@
     # enhanced log view
     lg = git log --graph --pretty="format:%C(yellow)%h%Cblue%d%Creset %s %C(white) %an, %ar%Creset"
 
+    # show users which have commits in current branch
+    userlist = "!git log --format='%aN' | sort -u"
+    # same as userlist, but with commit count
+    usercount = "!git log --format='%aN <%aE>' | awk '{arr[$0]++} END{for (i in arr){print arr[i], i;}}' | sort -nr"
+
 # always set `origin` as the default remote on the `master` branch
 [branch "master"]
     remote = origin
@@ -60,3 +65,14 @@
 [apply]
     # when applying a patch, strip whitespaces out
     whitespace = fix
+
+# git flow default configuration
+[gitflow "branch"]
+    master = master
+    develop = develop
+[gitflow "prefix"]
+    feature = feature/
+    release = release/
+    hotfix = hotfix/
+    support = support/
+    versiontag = v
