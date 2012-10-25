@@ -78,6 +78,9 @@ set -o ignoreeof
 ##
 # Autocomplete for alias 'g' (git)
 complete -o default -o nospace -F _git g
+# Autocompletion for git and git-flow
+source ~/git-completion/git-completion.bash
+source ~/git-completion/git-flow-completion.bash
 
 ##########################################
 ##  Bash Colors
