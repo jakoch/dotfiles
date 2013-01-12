@@ -44,12 +44,13 @@ alias grepnc='grep --color=none'
 alias px='ps aux|grep'
 
 ## apt-get
-#alias such='sudo apt-cache search'
-#alias inst='sudo apt-get install'
-alias au='sudo apt-get update'
-alias ax='sudo apt-get upgrade'
-#alias policy='sudo apt-cache policy'
-#alias show='sudo apt-cache show'
+alias update="sudo apt-get update"
+alias install="sudo apt-get install"
+alias upgrade="sudo apt-get upgrade"
+alias remove="sudo apt-get remove"
+
+# services alias
+alias service="sudo service"
 
 ##########################################
 ## Settings
