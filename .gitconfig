@@ -9,10 +9,22 @@
     token = @token@
 
 [color]
-    diff = auto
-    status = auto
-    branch = auto
     ui = auto
+
+[color "branch"]
+    current = red
+    remote = green
+
+[color "diff"]
+    meta = yellow bold
+    frag = magenta bold
+    old = red bold
+    new = green bold
+
+[color "status"]
+    added = yellow
+    changed = green
+    untracked = cyan
 
 [alias]
     br = branch
@@ -29,6 +41,10 @@
 
     # rebase interactive
     rbi = rebase -i
+
+    cp = cherry-pick
+    cps = cherry-pick -s
+    meh = commit --amend 
 
     # Undo `git push`
     undopush = push -f origin HEAD^:master
