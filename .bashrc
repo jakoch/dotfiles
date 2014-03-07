@@ -52,6 +52,13 @@ alias remove="sudo apt-get remove"
 # services alias
 alias service="sudo service"
 
+# system monitoring
+alias topcpu='ps aux | sort -n +2 | tail -10' # top 10 cpu procs
+alias topmem='ps aux | sort -n +3 | tail -10' # top 10 memory procs
+
+# show open ports
+alias local_ports='sudo nmap -sT -O localhost'
+
 ##########################################
 ## Settings
 ##
