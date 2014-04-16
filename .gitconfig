@@ -9,7 +9,12 @@
     token = @token@
 
 [color]
+    diff = auto
+    branch = auto
+    status = auto
+    interactive = auto
     ui = auto
+    pager = true
 
 [color "branch"]
     current = red
@@ -24,14 +29,18 @@
 [color "status"]
     added = yellow
     changed = green
-    untracked = cyan
+    untracked = red
 
 [alias]
     br = branch
-    c = commit
+    c  = commit
+    ca = commit --amend
     co = checkout
-    df = diff
-    st = status
+    d  = diff
+    s  = status
+
+    drop = stash drop
+    list = stash list
 
     # Pull in remote changes for the current repository and all its submodules
     p = !"git pull; git submodule foreach git pull origin master"
@@ -44,7 +53,6 @@
 
     cp = cherry-pick
     cps = cherry-pick -s
-    meh = commit --amend 
 
     # Undo `git push`
     undopush = push -f origin HEAD^:master
@@ -62,11 +70,16 @@
     # same as userlist, but with commit count
     usercount = "!git log --format='%aN <%aE>' | awk '{arr[$0]++} END{for (i in arr){print arr[i], i;}}' | sort -nr"
 
+    w = whatchanged --pretty=short
+
 # always set `origin` as the default remote on the `master` branch
 [branch "master"]
     remote = origin
     merge = refs/heads/master
     rebase = true
+
+[branch]
+  autosetupmerge = true
 
 [push]
     default = tracking
