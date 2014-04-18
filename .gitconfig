@@ -96,7 +96,7 @@
     # when applying a patch, strip whitespaces out
     whitespace = fix
 
-# git flow default configuration
+# git flow default configuration - https://github.com/nvie/gitflow
 [gitflow "branch"]
     master = master
     develop = develop
@@ -106,3 +106,13 @@
     hotfix = hotfix/
     support = support/
     versiontag = v
+
+# URL replacements
+
+[url "git@gist.github.com:"]
+    pushInsteadOf = git://gist.github.com/
+    pushInsteadOf = https://gist.github.com/
+
+[url "git@github.com:"]
+    pushInsteadOf = git://github.com/
+    pushInsteadOf = https://github.com/
