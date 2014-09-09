@@ -44,6 +44,9 @@
 
     # Pull in remote changes for the current repository and all its submodules
     p = !"git pull; git submodule foreach git pull origin master"
+    
+    # Fetches a Pull Request by number into own branch named "pr-$NUMBER"
+    pr = "!f() { git fetch origin pull/$1/head:pr-$1 && git checkout pr-$1; }; f"
 
     # Commit all changes
     ca = !git add -A && git commit -av
