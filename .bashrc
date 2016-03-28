@@ -9,8 +9,8 @@ umask 022
 
 ##########################################
 ## Locale - prefer US English with UTF-8
-export LC_ALL="en_US.UTF-8"
-export LANG="en_US"
+#export LC_ALL="en_US.UTF-8"
+#export LANG="en_US"
 
 ##########################################
 ## Aliases
