@@ -11,21 +11,34 @@
 
 set $mod Mod4
 
-# Font for window titles. Will also be used by the bar unless a different font
-# is used in the bar {} block below.
-# This font is widely installed, provides lots of unicode glyphs, right-to-left
-# text rendering and scalability on retina/hidpi displays (thanks to pango).
-font pango: Monospace 8
+#--------------------------------------------------------------------------------
+# Font
 
-# Before i3 v4.8, we used to recommend this one as the default:
-# font -misc-fixed-medium-r-normal--13-120-75-75-C-70-iso10646-1
-# The font above is very space-efficient, that is, it looks good, sharp and
-# clear in small sizes. However, its unicode glyph coverage is limited, the old
-# X core fonts rendering does not support right-to-left and this being a bitmap
-# font, it doesn’t scale on retina/hidpi displays.
+#set $ft xft:DroidSans:size=8
+#set $ft pango:Inconsolata:size=8
+#set $ft -xos4-terminesspowerline-medium-r-normal--12-120-72-72-c-60-iso10646-1
+font pango:Terminus 12
+set $ft terminus12
+#font $ft
+
+#--------------------------------------------------------------------------------
+# Look
+
+new_window pixel 2
+new_float pixel 2
+
+# arch blue 		#1793D1
+# debian red		#D70A53
+# manjaro green		#8CBC65
+# matrix green		#00FF00
+# mint green		#5FAA24
+# ubuntu orange  	#F37320
+set $color #D70A53
 
 workspace_layout tabbed
 
+#--------------------------------------------------------------------------------
+# KeyBindings
 
 # Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
@@ -35,6 +48,12 @@ bindsym $mod+Return exec i3-sensible-terminal
 
 # kill focused window
 bindsym $mod+Shift+q kill
+
+# Back and forth workplace switching
+workspace_auto_back_and_forth yes
+bindsym $mod+c workspace back_and_forth
+bindsym $mod+x workspace next
+bindsym $mod+z workspace prev
 
 # start dmenu (a program launcher)
 bindsym $mod+d exec dmenu_run
@@ -93,21 +112,42 @@ bindsym $mod+a focus parent
 # focus the child container
 #bindsym $mod+d focus child
 
+#--------------------------------------------------------------------------------
+# MOD+SHIFT+RETURN = Menu for Shutdown, Reboot, Lock Screen, and Logout #657b83
+
+set $sysmenu "system:  [P]oweroff  re[B]oot  [L]ock  logou[T] "
+bindsym $mod+Shift+Return      mode $sysmenu
+mode $sysmenu {
+    bindsym p         exec shutdown -P now
+    bindsym b         exec shutdown -r now
+    bindsym l         exec sh ~/.i3/i3lock.sh, mode "default"
+    bindsym t         exec --no-startup-id i3-msg exit, mode "default"
+    # exit menu
+    bindsym Return    mode "default"
+    bindsym Escape    mode "default"
+}
+
+#--------------------------------------------------------------------------------
+# Workspaces
+
+# Rename workspace with i3-input using numbers and text
+bindsym $mod+n exec i3-input -F 'rename workspace to "%s"' -P 'New name for this workspace: '
+
 # Name the workspaces
-set $tag1 "1: mc"
-set $tag2 "2: www"
-#set $tag3 "3: term"
-#set $tag4 "4: im"
-#set $tag5 "5:av"
-#set $tag6 "6:music"
+set $tag1  "1: mc"
+set $tag2  "2: web"
+set $tag3 "3: irc"
+set $tag4 "4: video"
+set $tag5 "5: music"
+set $tag6 "6: coding"
 
 # switch to workspace
 bindsym $mod+1 workspace $tag1
 bindsym $mod+2 workspace $tag2
-bindsym $mod+3 workspace 3
-bindsym $mod+4 workspace 4
-bindsym $mod+5 workspace 5
-bindsym $mod+6 workspace 6
+bindsym $mod+3 workspace $tag3
+bindsym $mod+4 workspace $tag4
+bindsym $mod+5 workspace $tag5
+bindsym $mod+6 workspace $tag6
 bindsym $mod+7 workspace 7
 bindsym $mod+8 workspace 8
 bindsym $mod+9 workspace 9
@@ -116,23 +156,38 @@ bindsym $mod+0 workspace 10
 # move focused container to workspace
 bindsym $mod+Shift+1 move container to workspace $tag1
 bindsym $mod+Shift+2 move container to workspace $tag2
-bindsym $mod+Shift+3 move container to workspace 3
-bindsym $mod+Shift+4 move container to workspace 4
-bindsym $mod+Shift+5 move container to workspace 5
-bindsym $mod+Shift+6 move container to workspace 6
+bindsym $mod+Shift+3 move container to workspace $tag3
+bindsym $mod+Shift+4 move container to workspace $tag4
+bindsym $mod+Shift+5 move container to workspace $tag5
+bindsym $mod+Shift+6 move container to workspace $tag6
 bindsym $mod+Shift+7 move container to workspace 7
 bindsym $mod+Shift+8 move container to workspace 8
 bindsym $mod+Shift+9 move container to workspace 9
 bindsym $mod+Shift+0 move container to workspace 10
 
+## Assign workspaces to programs
+assign [class="mc"] $tag1
+assign [class="^chromium-browser$"] $tag2
+
+# browser pop-ups
+for_window [window_role="pop-up"] floating enable;border normal
+for_window [window_role="task_dialog"] floating enable;border normal
+
+#--------------------------------------------------------------------------------
+
 # reload the configuration file
 bindsym $mod+Shift+c reload
+
 # restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
 bindsym $mod+Shift+r restart
-# exit i3 (logs you out of your X session)
-bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -b 'Yes, exit i3' 'i3-msg exit'"
 
+# exit i3 (logs you out of your X session)
+# not needed, when your autologin starts x
+#bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -b 'Yes, exit i3' 'i3-msg exit'"
+
+#--------------------------------------------------------------------------------
 # resize window (you can also use the mouse for that)
+
 mode "resize" {
         # These bindings trigger as soon as you enter the resize mode
 
@@ -158,27 +213,30 @@ mode "resize" {
 
 bindsym $mod+r mode "resize"
 
+#--------------------------------------------------------------------------------
 # Start i3bar to display a workspace bar (plus the system information i3status
 # finds out, if available)
-bar {
-    colors {
-        # Whole color settings
-        background #242424
-        statusline #ffffff
-        separator  #666666
 
-        # Type             border  background font
-        focused_workspace  #008fff #007fff #ffffff
-        active_workspace   #333333 #5f676a #ffffff
-        inactive_workspace #333333 #222222 #888888
-        urgent_workspace   #aa0000 #990000 #ffffff
-    }
-    # i3bar position
+bar {
     position top
-    # Using custom i3status.conf
+    colors {
+	background #222222
+	separator  #222222
+	statusline #dddddd
+    
+	focused_workspace  $color  $color  #ffffff
+	active_workspace   #333333 #333333 #888888
+	inactive_workspace #333333 #333333 #888888
+	urgent_workspace   #900000 #900000 #ffffff
+    }
     status_command i3status -c ~/.i3/i3status.conf
 }
 
+#--------------------------------------------------------------------------------
+# Startup programs
+
 # Background image
 exec --no-startup-id sh ~/.i3/wallpaper.sh
-exec --no-startup-id numlockx on
+
+exec "xterm -e mc"
+exec chromium
