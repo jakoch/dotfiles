@@ -8,29 +8,6 @@
     user = jakoch
     token = @token@
 
-[color]
-    diff = auto
-    branch = auto
-    status = auto
-    interactive = auto
-    ui = auto
-    pager = true
-
-[color "branch"]
-    current = red
-    remote = green
-
-[color "diff"]
-    meta = yellow bold
-    frag = magenta bold
-    old = red bold
-    new = green bold
-
-[color "status"]
-    added = yellow
-    changed = green
-    untracked = red
-
 [alias]
     br = branch
     c  = commit
@@ -75,6 +52,10 @@
 
     w = whatchanged --pretty=short
 
+    # When used after a pull, shows all new commits from old to new.
+    # Optionally takes the branch name.
+    whatsnew = !git hist --no-merges --reverse $1@{1}..$1@{0}
+
 # always set `origin` as the default remote on the `master` branch
 [branch "master"]
     remote = origin
@@ -95,14 +76,17 @@
     # enforce "trailing-spaces" and "mixing spaces with tabs" as errors
     # To get rid of trailing whitespace on all files in the current directory, use: sed -i 's/[[:space:]]*$//' *
     whitespace =  trailing-space,space-before-tab,cr-at-eol,tab-in-indent
+
 [apply]
     # when applying a patch, strip whitespaces out
     whitespace = fix
 
-# git flow default configuration - https://github.com/nvie/gitflow
+# git flow configuration - https://github.com/nvie/gitflow
+
 [gitflow "branch"]
     master = master
     develop = develop
+
 [gitflow "prefix"]
     feature = feature/
     release = release/
@@ -119,3 +103,66 @@
 [url "git@github.com:"]
     pushInsteadOf = git://github.com/
     pushInsteadOf = https://github.com/
+
+[transfer]
+  # Verify new objects to catch errors early.
+  # This is to prevent bad objects from spreading further.
+  fsckObjects = true
+
+[diff]
+  # Try harder to produce a clean diff.
+  # The "histogram" algorithm is an extension of the "patience" algorithm.
+  # It is faster than "patience" and the default "diff" algorithm.
+  algorithm = histogram
+
+  # Try to break up diffs at blank lines, so that brackets don't float away.
+  compactionHeuristic = true
+
+[merge]
+  # Show the common ancestor for merge conflicts.
+  conflictstyle = diff3
+
+[rebase]
+  # When doing an interactive rebase, automatically reorder and set the right
+  # actions for commits that were committed with --fixup or --squash.
+  autosquash = true
+
+[rerere]
+  # Remember conflict resolutions.
+  # If the same conflict appears again, use the previous resolution.
+  enabled = true
+
+  # If rerere successfully resolved a conflict, stage the conflicted file automatically.
+  autoupdate = true
+
+#
+# GUI style related settings
+#
+
+[gui]
+  fontdiff = -family Consolas -size 10 -weight normal -slant roman -underline 0 -overstrike 0
+  diffcontext = 4
+  encoding = utf-8
+
+[color]
+    diff = auto
+    branch = auto
+    status = auto
+    interactive = auto
+    ui = auto
+    pager = true
+
+[color "branch"]
+    current = red
+    remote = green
+
+[color "diff"]
+    meta = yellow bold
+    frag = magenta bold
+    old = red bold
+    new = green bold
+
+[color "status"]
+    added = yellow
+    changed = green
+    untracked = red
