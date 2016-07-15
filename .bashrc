@@ -68,6 +68,8 @@ set bell-style visible
 set show-all-if-ambiguous on
 # Show file info in complete
 set visible-stats on
+# disables the use of Ctrl-D to exit the shell
+set -o ignoreeof
 # Do not attempt completion on an empty line
 shopt -s no_empty_cmd_completion
 # correct minor spelling errors in a cd command
@@ -76,8 +78,16 @@ shopt -s cdspell
 shopt -s cmdhist
 # history expansion (the !something) allows to edit the expanded line before executing
 shopt -s histverify
-# disables the use of Ctrl-D to exit the shell
-set -o ignoreeof
+# Append to the Bash history file, rather than overwriting it
+shopt -s histappend;
+# case-insensitive globbing (used in pathname expansion)
+shopt -s nocaseglob;
+
+# enable some Bash 4 features when possible:
+# `automatic cd`, e.g. `**/here` will enter `./foo/bar/here`
+shopt -s globstar 2> /dev/null;
+# `recursive globbing`, e.g. `echo **/*.txt`
+shopt -s autocd   2> /dev/null;
 
 ##########################################
 ## Autocomplete
