@@ -14,10 +14,9 @@ set $mod Mod4
 #--------------------------------------------------------------------------------
 # Font
 
-#set $ft xft:DroidSans:size=8
-set $ft pango:Inconsolata:size=8
 #set $ft -xos4-terminesspowerline-medium-r-normal--12-120-72-72-c-60-iso10646-1
 #font pango:Terminus 12
+font pango:Inconsolata bold 10
 #set $ft terminus12
 #font $ft
 
@@ -115,18 +114,22 @@ bindsym $mod+a focus parent
 
 set $mode_system System (l) lock, (e) logout, (s) suspend, (h) hibernate, (r) reboot, (Shift+s) shutdown
 mode "$mode_system" {
-    bindsym l exec --no-startup-id i3exit lock, mode "default"
-    bindsym e exec --no-startup-id i3exit logout, mode "default"
-    bindsym s exec --no-startup-id i3exit suspend, mode "default"
-    bindsym h exec --no-startup-id i3exit hibernate, mode "default"
-    bindsym r exec --no-startup-id i3exit reboot, mode "default"
-    bindsym Shift+s exec --no-startup-id i3exit shutdown, mode "default"
+    bindsym l exec --no-startup-id ~/.i3/i3exit lock, mode "default"
+    bindsym e exec --no-startup-id ~/.i3/i3exit logout, mode "default"
+    bindsym s exec --no-startup-id ~/.i3/i3exit suspend, mode "default"
+    bindsym h exec --no-startup-id ~/.i3/i3exit hibernate, mode "default"
+    bindsym r exec --no-startup-id ~/.i3/i3exit reboot, mode "default"
+    bindsym Shift+s exec --no-startup-id ~/.i3/i3exit shutdown, mode "default"
 
     # back to normal: Enter or Escape
     bindsym Return mode "default"
     bindsym Escape mode "default"
 }
 bindsym $mod+Shift+Return mode "$mode_system"
+
+# cover both new and old ubuntu path references for this binary
+exec --no-startup-id /usr/lib/policykit-1-gnome/polkit-gnome-authentication-agent-1 &
+exec --no-startup-id /usr/libexec/polkit-gnome-authentication-agent-1 &
 
 #--------------------------------------------------------------------------------
 # Workspaces
@@ -141,6 +144,8 @@ set $tag3 "3: irc"
 set $tag4 "4: video"
 set $tag5 "5: music"
 set $tag6 "6: coding"
+set $tag7 "7: gfx"
+set $tag8 "8: ts"
 
 # switch to workspace
 bindsym $mod+1 workspace $tag1
@@ -149,8 +154,8 @@ bindsym $mod+3 workspace $tag3
 bindsym $mod+4 workspace $tag4
 bindsym $mod+5 workspace $tag5
 bindsym $mod+6 workspace $tag6
-bindsym $mod+7 workspace 7
-bindsym $mod+8 workspace 8
+bindsym $mod+7 workspace $tag7
+bindsym $mod+8 workspace $tag8
 bindsym $mod+9 workspace 9
 bindsym $mod+0 workspace 10
 
@@ -161,20 +166,29 @@ bindsym $mod+Shift+3 move container to workspace $tag3
 bindsym $mod+Shift+4 move container to workspace $tag4
 bindsym $mod+Shift+5 move container to workspace $tag5
 bindsym $mod+Shift+6 move container to workspace $tag6
-bindsym $mod+Shift+7 move container to workspace 7
-bindsym $mod+Shift+8 move container to workspace 8
+bindsym $mod+Shift+7 move container to workspace $tag7
+bindsym $mod+Shift+8 move container to workspace $tag8
 bindsym $mod+Shift+9 move container to workspace 9
 bindsym $mod+Shift+0 move container to workspace 10
 
 ## Assign workspaces to programs
 assign [class="mc"] $tag1
-assign [class="^chromium-browser$"] $tag2
-assign [class="^vlc$"] $tag4
-assign [class="^NetBeans$"] $tag6
+assign [class="chromium-browser"] $tag2
+assign [class="Iceweasel"] $tag2
+assign [class="VLC"] $tag4
+assign [class="NetBeans"] $tag6
+assign [class="Gimp"] $tag7
+assign [class="Shotwell"] $tag7
+assign [class="Ts3client_linux_amd64"] $tag8
 
 # browser pop-ups
 for_window [window_role="pop-up"] floating enable;border normal
 for_window [window_role="task_dialog"] floating enable;border normal
+
+# set netbeans load screen floating
+for_window [class="java-lang-Thread" instance="sun-awt-X11-XFramePeer" title="Starting NetBeans IDE"] floating enable
+for_window [class="java-lang-Thread" instance="sun-awt-X11-XFramePeer" title="Starting NetBeans IDE"] border none
+for_window [class="NetBeans"] layout stacking
 
 #--------------------------------------------------------------------------------
 
@@ -187,6 +201,9 @@ bindsym $mod+Shift+r restart
 # exit i3 (logs you out of your X session)
 # not needed, when your autologin starts x
 #bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -b 'Yes, exit i3' 'i3-msg exit'"
+
+# take screenshot
+bindsym Print exec scrot 'Screenshot - %Y-%m-%d--%_$wx$h.png' -e 'mv $f ~/images/'
 
 #--------------------------------------------------------------------------------
 # resize window (you can also use the mouse for that)
@@ -223,14 +240,14 @@ bindsym $mod+r mode "resize"
 bar {
     position top
     colors {
-	background #222222
-	separator  #222222
-	statusline #dddddd
-    
-	focused_workspace  $color  $color  #ffffff
-	active_workspace   #333333 #333333 #888888
-	inactive_workspace #333333 #333333 #888888
-	urgent_workspace   #900000 #900000 #ffffff
+        background #222222
+        separator  #222222
+        statusline #dddddd
+
+        focused_workspace  $color  $color  #ffffff
+        active_workspace   #333333 #333333 #888888
+        inactive_workspace #333333 #333333 #888888
+        urgent_workspace   #900000 #900000 #ffffff
     }
     status_command i3status -c ~/.i3/i3status.conf
 }
@@ -243,4 +260,4 @@ exec --no-startup-id sh ~/.i3/wallpaper.sh
 
 exec "xterm -e mc"
 exec chromium
-exec "/usr/local/netbeans-9.1/netbeans"
+exec /usr/local/netbeans-8.1/bin/netbeans
