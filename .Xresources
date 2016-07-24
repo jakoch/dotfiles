@@ -1,7 +1,46 @@
+!Xft settings:
+
+Xft*dpi:                96
+Xft*hinting:            true
+Xft*hintstyle:          2
+Xft*antialias:          true
+Xft*rgba:               rgb
+
+! URxvt settings
+
+URxvt*font:              -*-terminus-medium-r-*-*-14-*-*-*-*-*-*-*
+URxvt*boldFont:          -*-terminus-medium-r-*-*-14-*-*-*-*-*-*-*
+URxvt*loginShell:        true
+URxvt*scrollBar:         false
+!URxvt*scrollstyle:      plain
+!URxvt*scrollBar_right:  true
+URxvt*termName:          rxvt
+URxvt.buffered:          true
+URxvt.perl-ext:          default,matcher
+URxvt.urlLauncher:       chromium
+URxvt.matcher.button:    1.
+URxvt.transparent:       True
+URxvt.shading:           25
+URxvt*background:        black
+URxvt*foreground:        grey
+URxvt*font:              xft:Terminus-10
+URxvt*cursorColor:       green
+URxvt*fading:            10
+URxvt*fadeColor:         black
+URxvt*shading:           90
+URxvt*inheritPixmap:     true
+URxvt*scrollBar:         false
+URxvt*underlineURLs:     true
+
+! Xterm settings
+
+Xterm*background: black
+Xterm*foreground: grey
+
 ! calm by dkeg
 
 *foreground:  #adb7c1
-*background: #1a1b1d
+*background:  #1a1b1d
 
 *color0: #1d1f21
 *color1: #ab6548
