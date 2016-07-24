@@ -14,3 +14,7 @@ SourceSans Pro      SIL Open Font License   http://sourceforge.net/projects/sour
 Mensch                                      http://robey.lag.net/2010/06/21/mensch-font.html
 Menlo
 DejaVu              Public Domain           http://sourceforge.net/projects/dejavu/
+
+Remember to run the following command to refresh the font cache:
+
+    fc-cache -f -v
