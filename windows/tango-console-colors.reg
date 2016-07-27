@@ -1,6 +1,7 @@
 Windows Registry Editor Version 5.00
 ; A modified "Tango Desktop Project" color scheme for Windows Console
 ; See http://en.wikipedia.org/wiki/Tango_Desktop_Project#Palette
+; Imported from Debian terminal application.
 
 ; Values stored as 00-BB-GG-RR
 [HKEY_CURRENT_USER\Console]
