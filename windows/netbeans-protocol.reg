@@ -4,6 +4,7 @@ Windows Registry Editor Version 5.00
 ;
 ; 1. you need to replace the version number "1.2.3" in the paths below with your version
 ; 2. place "open-file-with-netbeans.bat" on %PATH%
+; 3. Edit "php.ini" and set: xdebug.file_link_format = "netbeans://open/?f=%f:%l"
 ;
 
 [HKEY_CLASSES_ROOT\netbeans]
