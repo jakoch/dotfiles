@@ -21,12 +21,14 @@ export COMMAND_NOT_FOUND_INSTALL_PROMPT=1
 ## Aliases
 ##
 
-# colorize `ls'
+# colorized shortcuts
 export LS_OPTIONS='--color=auto --human'
 eval "`dircolors`"
 alias ls='ls $LS_OPTIONS'
 alias ll='ls $LS_OPTIONS -l'
 alias l='ls $LS_OPTIONS -lA'
+alias ip='ip $LS_OPTIONS'
+alias diff='diff $LS_OPTIONS'
 
 ## aliases to avoid making mistakes:
 alias rm='rm -i'
@@ -47,6 +49,7 @@ alias dum='du --max-depth=1'
 alias grep='grep --color=always'
 alias grepnc='grep --color=none'
 alias px='ps aux|grep'
+alias wget='wget -c'
 
 ## apt-get
 alias update="sudo apt-get update"
@@ -102,6 +105,8 @@ complete -o default -o nospace -F _git g
 # Autocompletion for git and git-flow
 source ~/git-completion/git-completion.bash
 source ~/git-completion/git-flow-completion.bash
+# Github CLI
+[[ -x $( command -v gh ) ]] && eval "$( gh completion -s bash )"
 
 ##########################################
 ##  Bash Colors
@@ -124,6 +129,9 @@ light_cyan='\033[1;36m'
 light_gray='\033[0;37m'
 white='\033[1;37m'
 nocolor='\033[0m'
+
+## Colored GCC warnings and errors
+export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 
 ##########################################
 ##  ii : show host related infos
