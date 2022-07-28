@@ -1,5 +1,6 @@
 set breakpoint pending on
 
+# destination on the right side
 set disassembly-flavor intel
 
 #set mem inaccessible-by-default off
@@ -11,6 +12,7 @@ set history expansion on
 set history size 100000
 set history remove-duplicates 1
 
+# Pretty Printing
 set print pretty on
 set print object on
 set print static-members off
@@ -27,6 +29,9 @@ set height 0
 set width 0
 
 set confirm off
+
+# Show info from which files symbols are loaded from
+set verbose on
 
 set prompt \01\033[32m\002>> \001\033[0m\002
 
