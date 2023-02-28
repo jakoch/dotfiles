@@ -61,7 +61,7 @@ alias remove="sudo apt-get remove"
 alias service="sudo service"
 
 # system monitoring
-alias topcpu='ps -eo pcpu,pmem,pid,user,args | sort -k 1 -r | head -10' 
+alias topcpu='ps -eo pcpu,pmem,pid,user,args | sort -k 1 -r | head -10'
 
 # show open ports
 alias local_ports='sudo nmap -sT -O localhost'
@@ -102,9 +102,8 @@ shopt -s autocd   2> /dev/null;
 ##
 # Autocomplete for alias 'g' (git)
 complete -o default -o nospace -F _git g
-# Autocompletion for git and git-flow
+# Autocompletion for git
 source ~/git-completion/git-completion.bash
-source ~/git-completion/git-flow-completion.bash
 # Github CLI
 [[ -x $( command -v gh ) ]] && eval "$( gh completion -s bash )"
 
