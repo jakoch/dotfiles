@@ -86,6 +86,19 @@
         fi \
     }; f"
 
+    graph = log --all --graph --oneline --decorate
+
+	continuous-graph = "!watch -tc 'git -c color.ui=always graph | grep -A 60 -B 30 36mHEAD'"
+	continuous-diff = "!watch -tc 'git -c color.ui=always diff'"
+	continuous-status = "!watch -tc 'git -c color.ui=always status'"
+
+	slowrebase = "!bash -c 'for i in $(git rev-list --reverse $(git merge-base HEAD @{u})..@{u}); do git rebase $i || break; done'"
+
+    # stepwise rebase
+	steprebase = "!bash -c 'git rebase $(git rev-list --reverse $(git merge-base HEAD @{u})..@{u} | head -1)'"
+	steprebase10 = "!bash -c 'git rebase $(git rev-list --reverse $(git merge-base HEAD @{u})..@{u} | head -10 | tail -1)'"
+	steprebase100 = "!bash -c 'git rebase $(git rev-list --reverse $(git merge-base HEAD @{u})..@{u} | head -100 | tail -1)'"
+
 # always set `origin` as the default remote on the `main` branch
 [branch "master"]
     remote = origin
