@@ -100,7 +100,7 @@
 	steprebase100 = "!bash -c 'git rebase $(git rev-list --reverse $(git merge-base HEAD @{u})..@{u} | head -100 | tail -1)'"
 
 # always set `origin` as the default remote on the `main` branch
-[branch "master"]
+[branch "main"]
     remote = origin
     merge = refs/heads/main
     rebase = true
@@ -175,10 +175,6 @@
 
   # If rerere successfully resolved a conflict, stage the conflicted file automatically.
   autoupdate = true
-
-[help]
-  # Automatically correct and execute mistyped commands
-  autocorrect = 1
 
 [init]
   defaultBranch = main
