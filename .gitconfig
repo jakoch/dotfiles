@@ -160,6 +160,7 @@
   compactionHeuristic = true
 
 [merge]
+  tool = diffuse
   # Show the common ancestor for merge conflicts.
   conflictstyle = diff3
 
@@ -178,6 +179,9 @@
 
 [init]
   defaultBranch = main
+
+[advice]
+  skippedCherryPicks = false
 
 #
 # GUI style related settings
