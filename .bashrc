@@ -50,6 +50,7 @@ alias dum='du --max-depth=1'
 alias grep='grep --color=always'
 alias grepnc='grep --color=none'
 alias px='ps aux|grep'
+alias utc='date -u "+%Y-%m-%dT%H:%MZ"'
 alias wget='wget -c'
 
 ## apt-get
