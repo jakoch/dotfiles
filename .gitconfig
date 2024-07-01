@@ -1,149 +1,165 @@
+#
+# Git Config File
+#
 # http://www.kernel.org/pub/software/scm/git/docs/git-config.html
 
 [user]
-    name = Jens A. Koch
-    email = jakoch@web.de
+  name = Jens A. Koch
+  email = jakoch@web.de
 
 [github]
-    user = jakoch
-    token = @token@
+  user = jakoch
+  token = @token@
 
 [alias]
-    br = branch
-    c  = commit
-    co = checkout
-    d  = diff
-    s  = status
+  a  = commit --amend
+  br = branch
+  c  = commit
+  co = checkout
+  cp = cherry-pick
+  cps = cherry-pick -s
+  d   = diff
+  dc  = diff --cached
+  s  = status
 
-    drop = stash drop
-    list = stash list
+  drop = stash drop
+  list = stash list
 
-    # Amend the currently staged files to the latest commit
-    amend = commit --amend --reuse-message=HEAD
+  # Amend the currently staged files to the latest commit
+  amend = commit --amend --reuse-message=HEAD
 
-    # Commit all changes
-    ca = !git add -A && git commit -av
+  # Commit all changes
+  ca = !git add -A && git commit -av
 
-    cp = cherry-pick
-    cps = cherry-pick -s
+  # Remove branches that have already been merged with master (delete merged braches)
+  dm = "!git branch --merged | grep -v '\\*' | xargs -n 1 git branch -d"
 
-    # Remove branches that have already been merged with master (delete merged braches)
-    dm = "!git branch --merged | grep -v '\\*' | xargs -n 1 git branch -d"
+  # Switch to a branch, creating it if necessary
+  go = "!f() { git checkout -b \"$1\" 2> /dev/null || git checkout \"$1\"; }; f"
 
-    # Switch to a branch, creating it if necessary
-    go = "!f() { git checkout -b \"$1\" 2> /dev/null || git checkout \"$1\"; }; f"
+  # Pull in remote changes for the current repository and all its submodules
+  p = !"git pull; git submodule foreach git pull origin main"
 
-    # Pull in remote changes for the current repository and all its submodules
-    p = !"git pull; git submodule foreach git pull origin main"
-    
-    # Fetches a Pull Request by number into own branch named "pr-$NUMBER"
-    pr = "!f() { git fetch origin pull/$1/head:pr-$1 && git checkout pr-$1; }; f"
+  # Fetches a Pull Request by number into own branch named "pr-$NUMBER"
+  pr = "!f() { git fetch origin pull/$1/head:pr-$1 && git checkout pr-$1; }; f"
 
-    # rebase interactive
-    rbi = rebase -i
+  # Rebase interactive
+  rbi = rebase -i
 
-    # Interactive rebase with the given number of latest commits
-    reb = "!r() { git rebase -i HEAD~$1; }; r"
+  # Interactive rebase with the given number of latest commits
+  reb = "!f() { git rebase -i HEAD~$1; }; f"
 
-    # Remove the old tag with this name and tag the latest commit with it.
-    retag = "!r() { git tag -d $1 && git push origin :refs/tags/$1 && git tag $1; }; r"
+  # Remove the old tag with this name and tag the latest commit with it.
+  retag = "!f() { git tag -d $1 && git push origin :refs/tags/$1 && git tag $1; }; f"
 
-    # Undo `git push`
-    undopush = push -f origin HEAD^:main
+  # Undo `git push`
+  undopush = push -f origin HEAD^:main
 
-    # Show verbose output about tags, branches or remotes
-    tags = tag -l
-    branches = branch -a
-    remotes = remote -v
+  # Show verbose output about tags, branches or remotes
+  tags = tag -l
+  branches = branch -a
+  remotes = remote -v
 
-    # enhanced log view
-    lg = git log --graph --pretty="format:%C(yellow)%h%Cblue%d%Creset %s %C(white) %an, %ar%Creset"
+  # enhanced log view
+  lg1 = log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(auto)%d%C(reset)' --all
+  lg2 = log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset)%C(auto)%d%C(reset)%n''          %C(white)%s%C(reset) %C(dim white)- %an%C(reset)'
+  lg = lg1
 
-    # show users which have commits in current branch
-    userlist = "!git log --format='%aN' | sort -u"
-    
-    # same as userlist, but with commit count
-    usercount = "!git log --format='%aN <%aE>' | awk '{arr[$0]++} END{for (i in arr){print arr[i], i;}}' | sort -nr"
-    
-    # List contributors with number of commits
-    contributors = shortlog --summary --numbered
-    
-    w = whatchanged --pretty=short
+  # show users which have commits in current branch
+  userlist = "!git log --format='%aN' | sort -u"
 
-    # When used after a pull, shows all new commits from old to new.
-    # Optionally takes the branch name.
-    whatsnew = !git hist --no-merges --reverse $1@{1}..$1@{0}
+  # same as userlist, but with commit count
+  usercount = "!git log --format='%aN <%aE>' | awk '{arr[$0]++} END{for (i in arr){print arr[i], i;}}' | sort -nr"
 
-    # Merge GitHub pull request on top of the `main` branch
-    mergepr = "!f() { \
-        if [ $(printf \"%s\" \"$1\" | grep '^[0-9]\\+$' > /dev/null; printf $?) -eq 0 ]; then \
-            git fetch origin refs/pull/$1/head:pr/$1 && \
-            git rebase main pr/$1 && \
-            git checkout main && \
-            git merge pr/$1 && \
-            git branch -D pr/$1 && \
-            git commit --amend -m \"$(git log -1 --pretty=%B)\n\nCloses #$1.\"; \
-        fi \
-    }; f"
+  # List contributors with number of commits
+  contributors = shortlog --summary --numbered
 
-    graph = log --all --graph --oneline --decorate
+  w = whatchanged --pretty=short
 
-	continuous-graph = "!watch -tc 'git -c color.ui=always graph | grep -A 60 -B 30 36mHEAD'"
-	continuous-diff = "!watch -tc 'git -c color.ui=always diff'"
-	continuous-status = "!watch -tc 'git -c color.ui=always status'"
+  # When used after a pull, shows all new commits from old to new.
+  # Optionally takes the branch name.
+  whatsnew = !git hist --no-merges --reverse $1@{1}..$1@{0}
 
-	slowrebase = "!bash -c 'for i in $(git rev-list --reverse $(git merge-base HEAD @{u})..@{u}); do git rebase $i || break; done'"
+  # Merge GitHub pull request on top of the current branch
+  # or if a branch name is given, on top of that branch
+  mergepr = "!f() { \
+      declare currentBranch=\"$(git symbolic-ref --short HEAD)\"; \
+      declare branch=\"${2:-$currentBranch}\"; \
+      if [ $(printf \"%s\" \"$1\" | grep '^[0-9]\\+$' > /dev/null; printf $?) -eq 0 ]; then \
+          git fetch origin refs/pull/$1/head:pr/$1 && \
+          git checkout -B $branch && \
+          git rebase $branch pr/$1 && \
+          git checkout -B $branch && \
+          git merge pr/$1 && \
+          git branch -D pr/$1 && \
+          git commit --amend -m \"$(git log -1 --pretty=%B)\n\nClose #$1\"; \
+      fi \
+  }; f"
+
+  # List remote branches
+  lrb = "!f() { \
+    remote="${1:-origin}"; \
+    git ls-remote --heads "$remote"; \
+  }; f"
+
+  graph = log --all --graph --oneline --decorate
+
+  continuous-graph = "!watch -tc 'git -c color.ui=always graph | grep -A 60 -B 30 36mHEAD'"
+  continuous-diff = "!watch -tc 'git -c color.ui=always diff'"
+  continuous-status = "!watch -tc 'git -c color.ui=always status'"
+
+  slowrebase = "!bash -c 'for i in $(git rev-list --reverse $(git merge-base HEAD @{u})..@{u}); do git rebase $i || break; done'"
 
     # stepwise rebase
-	steprebase = "!bash -c 'git rebase $(git rev-list --reverse $(git merge-base HEAD @{u})..@{u} | head -1)'"
-	steprebase10 = "!bash -c 'git rebase $(git rev-list --reverse $(git merge-base HEAD @{u})..@{u} | head -10 | tail -1)'"
-	steprebase100 = "!bash -c 'git rebase $(git rev-list --reverse $(git merge-base HEAD @{u})..@{u} | head -100 | tail -1)'"
+  steprebase = "!bash -c 'git rebase $(git rev-list --reverse $(git merge-base HEAD @{u})..@{u} | head -1)'"
+  steprebase10 = "!bash -c 'git rebase $(git rev-list --reverse $(git merge-base HEAD @{u})..@{u} | head -10 | tail -1)'"
+  steprebase100 = "!bash -c 'git rebase $(git rev-list --reverse $(git merge-base HEAD @{u})..@{u} | head -100 | tail -1)'"
 
 # always set `origin` as the default remote on the `main` branch
 [branch "main"]
-    remote = origin
-    merge = refs/heads/main
-    rebase = true
+  remote = origin
+  merge = refs/heads/main
+  rebase = true
 
 [branch]
   autosetupmerge = true
 
 [push]
-    default = tracking
+  default = tracking
 
 [format]
-    pretty = %Cblue%h%Creset %Cgreen[%ar]%Creset (%an) %s
+  pretty = %Cblue%h%Creset %Cgreen[%ar]%Creset (%an) %s
 
 # anti whitespace / anti tab
 [core]
-    # enforce "trailing-spaces" and "mixing spaces with tabs" as errors
-    # To get rid of trailing whitespace on all files in the current directory, use: sed -i 's/[[:space:]]*$//' *
-    whitespace =  trailing-space,space-before-tab,cr-at-eol,tab-in-indent
+  # enforce "trailing-spaces" and "mixing spaces with tabs" as errors
+  # To get rid of trailing whitespace on all files in the current directory, use: sed -i 's/[[:space:]]*$//' *
+  whitespace =  trailing-space,space-before-tab,cr-at-eol,tab-in-indent
 
-    trustctime = false
-    precomposeunicode = false
+  trustctime = false
+  precomposeunicode = false
 
 [apply]
-    # when applying a patch, strip whitespaces out
-    whitespace = fix
+  # when applying a patch, strip whitespaces out
+  whitespace = fix
 
 # URL replacements
 
 [url "git@github.com:"]
-    insteadOf = "gh:"
-    pushInsteadOf = "github:"
-    pushInsteadOf = "git://github.com/"
+  insteadOf = "gh:"
+  pushInsteadOf = "github:"
+  pushInsteadOf = "git://github.com/"
 
 [url "git://github.com/"]
-    insteadOf = "github:"
+  insteadOf = "github:"
 
 [url "git@gist.github.com:"]
-    insteadOf = "gst:"
-    pushInsteadOf = "gist:"
-    pushInsteadOf = "git://gist.github.com/"
+  insteadOf = "gst:"
+  pushInsteadOf = "gist:"
+  pushInsteadOf = "git://gist.github.com/"
 
 [url "git://gist.github.com/"]
-    insteadOf = "gist:"
+  insteadOf = "gist:"
 
 [transfer]
   # Verify new objects to catch errors early.
@@ -193,24 +209,24 @@
   encoding = utf-8
 
 [color]
-    diff = auto
-    branch = auto
-    status = auto
-    interactive = auto
-    ui = auto
-    pager = true
+  diff = auto
+  branch = auto
+  status = auto
+  interactive = auto
+  ui = auto
+  pager = true
 
 [color "branch"]
-    current = red
-    remote = green
+  current = red
+  remote = green
 
 [color "diff"]
-    meta = yellow bold
-    frag = magenta bold
-    old = red bold
-    new = green bold
+  meta = yellow bold
+  frag = magenta bold
+  old = red bold
+  new = green bold
 
 [color "status"]
-    added = yellow
-    changed = green
-    untracked = red
+  added = yellow
+  changed = green
+  untracked = red

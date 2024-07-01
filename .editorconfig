@@ -48,4 +48,5 @@ indent_size = 2
 indent_style = space
 indent_size = 4
 
-
+[.gitconfig]
+indent_size = 2
