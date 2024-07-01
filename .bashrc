@@ -1,3 +1,4 @@
+# shellcheck shell=bash
 # ~/.bashrc: executed by bash(1) for non-login shells.
 
 ##########################################
@@ -49,6 +50,7 @@ alias dum='du --max-depth=1'
 alias grep='grep --color=always'
 alias grepnc='grep --color=none'
 alias px='ps aux|grep'
+alias utc='date -u "+%Y-%m-%dT%H:%MZ"'
 alias wget='wget -c'
 
 ## apt-get
@@ -78,24 +80,36 @@ set show-all-if-ambiguous on
 set visible-stats on
 # disables the use of Ctrl-D to exit the shell
 set -o ignoreeof
-# Do not attempt completion on an empty line
-shopt -s no_empty_cmd_completion
-# correct minor spelling errors in a cd command
-shopt -s cdspell
-# cause multi-line commands to be appended to your bash history as a single line command
-shopt -s cmdhist
-# history expansion (the !something) allows to edit the expanded line before executing
-shopt -s histverify
-# Append to the Bash history file, rather than overwriting it
-shopt -s histappend;
-# case-insensitive globbing (used in pathname expansion)
-shopt -s nocaseglob;
 
-# enable some Bash 4 features when possible:
-# `automatic cd`, e.g. `**/here` will enter `./foo/bar/here`
-shopt -s globstar 2> /dev/null;
-# `recursive globbing`, e.g. `echo **/*.txt`
-shopt -s autocd   2> /dev/null;
+
+##########################################
+## Options
+##
+## https://www.gnu.org/software/bash/manual/bash.html#The-Shopt-Builtin
+
+_shopts=(
+  cdspell                  # correct minor spelling errors in a cd command
+  checkhash                # check hash table before path search
+  checkwinsize             # update LINES and COLUMNS after every command 
+  cmdhist                  # cause multi-line commands to be appended to your bash history as a single line command
+  histappend               # Append to the Bash history file, rather than overwriting it
+  histverify               # history expansion (the !something) allows to edit the expanded line before executing
+  huponexit                # SIGHUP all jobs on exit
+  lithist                  # save multi line comments to history with new lines
+  nocaseglob               # case-insensitive globbing (used in pathname expansion)
+  no_empty_cmd_completion  # Do not attempt completion on an empty line
+)
+
+# try to enable some Bash 4 features, if possible:
+if (( BASH_VERSINFO[0] > 3 )); then
+  _shopts+=( 
+    autocd                 # like zsh,  `automatic cd`, e.g. `**/here` will enter `./foo/bar/here`
+    checkjobs              # check running jobs when exiting interactive shell
+    globstar               # `recursive globbing`, e.g. `echo **/*.txt`
+  )
+fi
+
+shopt -s "${_shopts[@]}"; unset _shopts
 
 ##########################################
 ## Autocomplete

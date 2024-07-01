@@ -34,7 +34,7 @@
     go = "!f() { git checkout -b \"$1\" 2> /dev/null || git checkout \"$1\"; }; f"
 
     # Pull in remote changes for the current repository and all its submodules
-    p = !"git pull; git submodule foreach git pull origin master"
+    p = !"git pull; git submodule foreach git pull origin main"
     
     # Fetches a Pull Request by number into own branch named "pr-$NUMBER"
     pr = "!f() { git fetch origin pull/$1/head:pr-$1 && git checkout pr-$1; }; f"
@@ -49,7 +49,7 @@
     retag = "!r() { git tag -d $1 && git push origin :refs/tags/$1 && git tag $1; }; r"
 
     # Undo `git push`
-    undopush = push -f origin HEAD^:master
+    undopush = push -f origin HEAD^:main
 
     # Show verbose output about tags, branches or remotes
     tags = tag -l
@@ -74,22 +74,35 @@
     # Optionally takes the branch name.
     whatsnew = !git hist --no-merges --reverse $1@{1}..$1@{0}
 
-    # Merge GitHub pull request on top of the `master` branch
+    # Merge GitHub pull request on top of the `main` branch
     mergepr = "!f() { \
         if [ $(printf \"%s\" \"$1\" | grep '^[0-9]\\+$' > /dev/null; printf $?) -eq 0 ]; then \
             git fetch origin refs/pull/$1/head:pr/$1 && \
-            git rebase master pr/$1 && \
-            git checkout master && \
+            git rebase main pr/$1 && \
+            git checkout main && \
             git merge pr/$1 && \
             git branch -D pr/$1 && \
             git commit --amend -m \"$(git log -1 --pretty=%B)\n\nCloses #$1.\"; \
         fi \
     }; f"
 
-# always set `origin` as the default remote on the `master` branch
-[branch "master"]
+    graph = log --all --graph --oneline --decorate
+
+	continuous-graph = "!watch -tc 'git -c color.ui=always graph | grep -A 60 -B 30 36mHEAD'"
+	continuous-diff = "!watch -tc 'git -c color.ui=always diff'"
+	continuous-status = "!watch -tc 'git -c color.ui=always status'"
+
+	slowrebase = "!bash -c 'for i in $(git rev-list --reverse $(git merge-base HEAD @{u})..@{u}); do git rebase $i || break; done'"
+
+    # stepwise rebase
+	steprebase = "!bash -c 'git rebase $(git rev-list --reverse $(git merge-base HEAD @{u})..@{u} | head -1)'"
+	steprebase10 = "!bash -c 'git rebase $(git rev-list --reverse $(git merge-base HEAD @{u})..@{u} | head -10 | tail -1)'"
+	steprebase100 = "!bash -c 'git rebase $(git rev-list --reverse $(git merge-base HEAD @{u})..@{u} | head -100 | tail -1)'"
+
+# always set `origin` as the default remote on the `main` branch
+[branch "main"]
     remote = origin
-    merge = refs/heads/master
+    merge = refs/heads/main
     rebase = true
 
 [branch]
@@ -113,19 +126,6 @@
 [apply]
     # when applying a patch, strip whitespaces out
     whitespace = fix
-
-# git flow configuration - https://github.com/nvie/gitflow
-
-[gitflow "branch"]
-    master = master
-    develop = develop
-
-[gitflow "prefix"]
-    feature = feature/
-    release = release/
-    hotfix = hotfix/
-    support = support/
-    versiontag = v
 
 # URL replacements
 
@@ -160,6 +160,7 @@
   compactionHeuristic = true
 
 [merge]
+  tool = diffuse
   # Show the common ancestor for merge conflicts.
   conflictstyle = diff3
 
@@ -176,9 +177,11 @@
   # If rerere successfully resolved a conflict, stage the conflicted file automatically.
   autoupdate = true
 
-[help]
-  # Automatically correct and execute mistyped commands
-  autocorrect = 1
+[init]
+  defaultBranch = main
+
+[advice]
+  skippedCherryPicks = false
 
 #
 # GUI style related settings
