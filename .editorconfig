@@ -11,30 +11,41 @@ trim_trailing_whitespace = true
 
 # Python - 4 space indentation (pep8)
 [*.py]
-indent_style = space
 indent_size = 4
 
 [*.php]
-indent_style = space
 indent_size = 4
 
-[*.js]
-indent_style = space
+[*.{js,ts}]
 indent_size = 2
 
 [{*.yml,*.json}]
-indent_style = space
 indent_size = 2
 
 [{CMakeLists.txt,*.cmake}]
-indent_style = space
+indent_size = 2
+
+[*.{c,cc,cpp,h,hpp,hxx,inl}]
 indent_size = 4
+trim_trailing_whitespace = true
+
+[*.sh]
+indent_size = 2
 
 [*.{md,txt}]
-indent_style = space
 indent_size = 4
 max_line_length = 105
 trim_trailing_whitespace = false
 
-[Makefile]
+# -------------------------------
+# Config files
+# -------------------------------
+
+[*.{clang-format}]
+indent_size = 2
+
+[Dockerfile]
 indent_style = space
+indent_size = 4
+
+

@@ -13,9 +13,6 @@ phpmd.xml export-ignore
 phpunit.xml.dist export-ignore
 /tests export-ignore
 
-# Mac OS X Finder and whatnot
-.DS_Store
-
 # Windows crap
 Thumbs.db
 
@@ -36,10 +33,6 @@ nbproject
 
 # Scriptfiles
 *.log
-
-# Subversion
-.svn
-.svn/entries
 
 # PHPUnit
 # phpunit.xml
