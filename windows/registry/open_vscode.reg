@@ -1,0 +1,15 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_CLASSES_ROOT\Directory\Background\shell\OpenVSCode]
+@="Open Folder in VS Code"
+"Icon"="C:\\Users\\jakoch\\AppData\\Local\\Programs\\Microsoft VS Code\\Code.exe"
+
+[HKEY_CLASSES_ROOT\Directory\Background\shell\OpenVSCode\command]
+@="\"C:\\Users\\jakoch\\AppData\\Local\\Programs\\Microsoft VS Code\\Code.exe\" \"%V\""
+
+[HKEY_CLASSES_ROOT\Directory\shell\OpenVSCode]
+@="Open Folder in VS Code"
+"Icon"="C:\\Users\\jakoch\\AppData\\Local\\Programs\\Microsoft VS Code\\Code.exe"
+
+[HKEY_CLASSES_ROOT\Directory\shell\OpenVSCode\command]
+@="\"C:\\Users\\jakoch\\AppData\\Local\\Programs\\Microsoft VS Code\\Code.exe\" \"%V\""
