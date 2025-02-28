@@ -22,6 +22,7 @@
   dc  = diff --cached
   s  = status
 
+  # Stash control commands
   drop = stash drop
   list = stash list
 
@@ -74,6 +75,7 @@
   # List contributors with number of commits
   contributors = shortlog --summary --numbered
 
+  # Show Git log with raw diffs, skipping merges  
   w = whatchanged --pretty=short
 
   # When used after a pull, shows all new commits from old to new.
@@ -81,7 +83,7 @@
   whatsnew = !git hist --no-merges --reverse $1@{1}..$1@{0}
 
   # Merge GitHub pull request on top of the current branch
-  # or if a branch name is given, on top of that branch
+  # or on top of a specified branch
   mergepr = "!f() { \
       declare currentBranch=\"$(git symbolic-ref --short HEAD)\"; \
       declare branch=\"${2:-$currentBranch}\"; \
@@ -102,18 +104,21 @@
     git ls-remote --heads "$remote"; \
   }; f"
 
+  # Show commit history as a graph with decorations and a compact format 
   graph = log --all --graph --oneline --decorate
 
+  # Continuously monitor Git graph, diff, or status with color
   continuous-graph = "!watch -tc 'git -c color.ui=always graph | grep -A 60 -B 30 36mHEAD'"
   continuous-diff = "!watch -tc 'git -c color.ui=always diff'"
   continuous-status = "!watch -tc 'git -c color.ui=always status'"
 
+  # Perform an interactive-like rebase one commit at a time
   slowrebase = "!bash -c 'for i in $(git rev-list --reverse $(git merge-base HEAD @{u})..@{u}); do git rebase $i || break; done'"
 
-    # stepwise rebase
+  # stepwise rebase with single commit, 10 commits, 25 commits
   steprebase = "!bash -c 'git rebase $(git rev-list --reverse $(git merge-base HEAD @{u})..@{u} | head -1)'"
   steprebase10 = "!bash -c 'git rebase $(git rev-list --reverse $(git merge-base HEAD @{u})..@{u} | head -10 | tail -1)'"
-  steprebase100 = "!bash -c 'git rebase $(git rev-list --reverse $(git merge-base HEAD @{u})..@{u} | head -100 | tail -1)'"
+  steprebase25 = "!bash -c 'git rebase $(git rev-list --reverse $(git merge-base HEAD @{u})..@{u} | head -25 | tail -1)'"
 
 # always set `origin` as the default remote on the `main` branch
 [branch "main"]
