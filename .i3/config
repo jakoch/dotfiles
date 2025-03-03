@@ -259,5 +259,5 @@ bar {
 exec --no-startup-id sh ~/.i3/wallpaper.sh
 
 exec "xterm -e mc"
-exec chromium
-exec /usr/local/netbeans-8.1/bin/netbeans
+#exec chromium
+#exec /usr/local/netbeans-8.1/bin/netbeans

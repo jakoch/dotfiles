@@ -5,8 +5,8 @@
 # global xinitrc file, used by all X sessions started by xinit (startx)
 
 ## launch SSH agents
-eval $(/usr/bin/killall ssh-agent; /usr/bin/ssh-agent)
-eval $(/usr/bin/killall gpg-agent; /usr/bin/gpg-agent --daemon)
+eval "$(/usr/bin/killall ssh-agent; /usr/bin/ssh-agent)"
+eval "$(/usr/bin/killall gpg-agent; /usr/bin/gpg-agent --daemon)"
 
 ## launch dropbox, if installed
 #[ -x ~/.dropbox-dist/dropboxd & ]
@@ -28,11 +28,12 @@ amixer sset 'Master' unmute
 
 if [ -d /etc/X11/xinit/xinitrc.d ]; then
     for f in /etc/X11/xinit/xinitrc.d/*; do
+        # shellcheck source=/dev/null
         [ -x "$f" ] && . "$f"
     done
     unset f
 fi
 
-[[ -f ~/.Xresources ]] && xrdb -merge ~/.Xresources
+[ -f ~/.Xresources ] && xrdb -merge ~/.Xresources
 
 exec i3 --force-xinerama

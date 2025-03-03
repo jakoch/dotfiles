@@ -90,7 +90,7 @@ set -o ignoreeof
 _shopts=(
   cdspell                  # correct minor spelling errors in a cd command
   checkhash                # check hash table before path search
-  checkwinsize             # update LINES and COLUMNS after every command 
+  checkwinsize             # update LINES and COLUMNS after every command
   cmdhist                  # cause multi-line commands to be appended to your bash history as a single line command
   histappend               # Append to the Bash history file, rather than overwriting it
   histverify               # history expansion (the !something) allows to edit the expanded line before executing
@@ -102,7 +102,7 @@ _shopts=(
 
 # try to enable some Bash 4 features, if possible:
 if (( BASH_VERSINFO[0] > 3 )); then
-  _shopts+=( 
+  _shopts+=(
     autocd                 # like zsh,  `automatic cd`, e.g. `**/here` will enter `./foo/bar/here`
     checkjobs              # check running jobs when exiting interactive shell
     globstar               # `recursive globbing`, e.g. `echo **/*.txt`

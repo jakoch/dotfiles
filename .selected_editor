@@ -1,1 +1,8 @@
+#
+# select-editor
+#
+# https://manpages.debian.org/testing/sensible-utils/select-editor.1.en.html
+#
+# SELECTED_EDITOR is overridden by the VISUAL and EDITOR environment variables.
+
 SELECTED_EDITOR="/usr/bin/mcedit"

@@ -1,0 +1,20 @@
+{
+  "name": "Debian Slim Dev Container",
+  "image": "debian:trixie-slim",
+  "customizations": {
+    "vscode": {
+      // Add the IDs of extensions you want installed when the container is created.
+      "extensions": [
+        // EditorConfig
+        "EditorConfig.EditorConfig"
+      ],
+      "vscode": {
+        "settings": {
+          "extensions.ignoreRecommendations": true,
+          "terminal.integrated.shell.linux": "/bin/bash"
+        }
+      }
+    },
+    "remoteUser": "root"
+  }
+}

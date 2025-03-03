@@ -1,0 +1,157 @@
+name: Lint
+
+on: [push, pull_request]
+
+jobs:
+  lint:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y shellcheck dos2unix jq curl wget aria2 gdb git
+
+      # LINT .github/workflows/lint.yml
+      # downloading to /opt so that the workspace folder remains clean
+      - name: LINT all workflows using rhysd/actionlint
+        run: |
+          sudo curl -Lo /opt/actionlint_1.7.7_linux_amd64.tar.gz https://github.com/rhysd/actionlint/releases/download/v1.7.7/actionlint_1.7.7_linux_amd64.tar.gz
+          sudo tar -xzvf /opt/actionlint_1.7.7_linux_amd64.tar.gz -C /opt
+          sudo chmod +x /opt/actionlint
+          /opt/actionlint -version
+          /opt/actionlint -debug
+
+      - name: Set locale
+        run: |
+          export LC_ALL=C.UTF-8
+          export LANG=C.UTF-8
+          export LANGUAGE=C.UTF-8
+
+      - name: COMMON Lint line endings (show files with DOS LE and EOL errors)
+        run: |
+          find . -name '*.*' -print0 | xargs -0 dos2unix -e -ic
+
+      - name: COMMON Lint shell scripts
+        run: |
+          find . -name "*.sh" -print0 | xargs -0 shellcheck
+
+      - name: LINT .devcontainer/devcontainer.json
+        run: |
+          sed 's/\/\/.*//' .devcontainer/devcontainer.json | jq . > /dev/null && echo "✅ Ok." || echo "❌ Error: Invalid JSON."
+
+      # LINT .i3/i3exit.sh
+      # LINT .i3/wallpaper.sh
+      # LINT .i3/i3status.conf is this yaml? i dont know how to lint it
+      - name: LINT .i3 folder
+        run: |
+          shellcheck .i3/*.sh
+
+      - name: LINT .jq/colors.jq
+        run: |
+          echo '{"test": "✅ this should be green and bold"}' | jq -L .jq -r 'import "colors" as c; c::bold(c::green(.test))'
+
+      #- name: LINT windows folder
+      #  run: |
+      #    shellcheck windows/setup.bat
+
+      - name: LINT .aria2.conf
+        run: |
+          aria2c --conf-path .aria2.conf --dry-run "https://raw.githubusercontent.com/jakoch/dotfiles/refs/heads/main/README.md"
+
+      - name: LINT .bash_profile
+        run: |
+          bash -n .bash_profile
+          shellcheck -s bash .bash_profile
+
+      - name: LINT .bashrc
+        run: |
+          bash -n .bashrc
+        # shellcheck -s bash .bashrc
+
+      - name: LINT .curlrc
+        run: |
+          curl --config .curlrc --output /dev/null "https://raw.githubusercontent.com/jakoch/dotfiles/refs/heads/main/README.md"
+
+      - name: LINT .dircolors
+        run: |
+          dircolors --print-ls-colors .dircolors
+
+      - name: LINT .editorconfig
+        run: |
+          curl -LO https://github.com/editorconfig-checker/editorconfig-checker/releases/download/v3.2.0/editorconfig-checker_3.2.0_linux_amd64.deb
+          sudo dpkg -i editorconfig-checker_3.2.0_linux_amd64.deb
+          sudo apt-get -f install
+          editorconfig-checker
+
+      - name: LINT .editorconfig-checker.json
+        run: |
+          sed 's/\/\/.*//' .editorconfig-checker.json | jq . > /dev/null && echo "✅ Ok." || echo "❌ Error: Invalid JSON."
+
+      - name: LINT .fehbg
+        run: |
+          shellcheck -s sh .fehbg
+
+      - name: LINT .gdbinit
+        run: |
+          gdb -nx -q -x .gdbinit
+
+      - name: LINT .gitconfig
+        run: |
+          git config --file .gitconfig --name-only --list
+
+      - name: LINT .gitignore
+        run: |
+          grep '^[[:space:]]' .gitignore && echo "❌ Line(s) with leading spaces found." || echo "✅ Ok."
+
+      - name: LINT .htoprc
+        run: |
+          grep '^[[:space:]]' .htoprc && echo "❌ Line(s) with leading spaces found." || echo "✅ Ok."
+
+      - name: LINT .icons
+        run: |
+          shellcheck .icons
+
+      - name: LINT .inputrc
+        run: |
+          grep '^[[:space:]]' .inputrc && echo "❌ Line(s) with leading spaces found." || echo "✅ Ok."
+
+      - name: LINT .minttyrc
+        run: |
+          grep '^[[:space:]]' .minttyrc && echo "❌ Line(s) with leading spaces found." || echo "✅ Ok."
+
+      - name: LINT .profile
+        run: |
+          shellcheck -s sh .profile
+
+      - name: LINT .screenrc
+        run: |
+          grep '^[[:space:]]' .screenrc && echo "❌ Line(s) with leading spaces found." || echo "✅ Ok."
+
+      - name: LINT .selected_editor
+        run: |
+          grep '^[[:space:]]' .selected_editor && echo "❌ Line(s) with leading spaces found." || echo "✅ Ok."
+
+      - name: LINT .tmux.conf
+        run: |
+          grep '^[[:space:]]' .tmux.conf && echo "❌ Line(s) with leading spaces found." || echo "✅ Ok."
+        #tmux -f .tmux.conf
+
+      - name: LINT .wgetrc
+        run: |
+          grep '^[[:space:]]' .wgetrc && echo "❌ Line(s) with leading spaces found." || echo "✅ Ok."
+          wget --config .wgetrc --output-document /dev/null "https://raw.githubusercontent.com/jakoch/dotfiles/refs/heads/main/README.md"
+
+      - name: LINT .xinitrc
+        run: |
+          shellcheck .xinitrc
+
+      - name: LINT .Xresources
+        run: |
+          grep -n '^[^[:space:]]*![^[:space:]]' .Xresources && echo "❌ Line(s) with comments not starting with a space found ('! comment')." || echo "✅ Ok."
+
+      - name: LINT linter-file-cov.sh
+        run: |
+          shellcheck .github/scripts/linter-file-cov.sh

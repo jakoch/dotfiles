@@ -75,7 +75,7 @@
   # List contributors with number of commits
   contributors = shortlog --summary --numbered
 
-  # Show Git log with raw diffs, skipping merges  
+  # Show Git log with raw diffs, skipping merges
   w = whatchanged --pretty=short
 
   # When used after a pull, shows all new commits from old to new.
@@ -104,7 +104,7 @@
     git ls-remote --heads "$remote"; \
   }; f"
 
-  # Show commit history as a graph with decorations and a compact format 
+  # Show commit history as a graph with decorations and a compact format
   graph = log --all --graph --oneline --decorate
 
   # Continuously monitor Git graph, diff, or status with color

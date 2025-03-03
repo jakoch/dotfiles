@@ -1,5 +1,5 @@
 #
-# 
+# .gdbinit
 #
 
 set breakpoint pending on
