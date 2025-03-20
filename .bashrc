@@ -153,26 +153,34 @@ export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quo
 HOST=$(hostname -f 2>/dev/null || hostname)
 
 function ii() {
-    local O_LANG=$LANG
-    local O_LC_ALL=$LC_ALL
-    local MY_IF=$(/sbin/ifconfig | awk '/Link / { print $1 } ')
+  local O_LANG=$LANG
+  local O_LC_ALL=$LC_ALL
+  local MY_IFS=$(command -v ifconfig >/dev/null 2>&1 && /sbin/ifconfig | awk '/Link / { print $1 } ' || ip addr show | awk '/inet / { print $NF }')
 
-    LANG=C
-    LC_ALL=C
+  LANG=C
+  LC_ALL=C
 
-    echo -e "\n${nocolor}You are logged in to ${light_red}${HOST}${nocolor} - $(date)"
-    echo -e "\n${light_red}Kernel version:${nocolor} " ; uname -a
-    echo -e "\n${light_red}Users logged on:${nocolor} " ; w -h
-    echo -e "\n${light_red}Machine stats :${nocolor} " ; uptime
-    echo -e "\n${light_red}Memory stats :${nocolor} " ; free -m
-    echo -e "\n${light_red}Disk stats :${nocolor} " ; df -h
-    for my_if in $MY_IF; do
-    echo -e "\n${light_red}Interface $my_if :${nocolor}" ;
-        /sbin/ifconfig $my_if | awk '/inet / { print $2 } ' | cut -d ":" -f 2
-        /sbin/ifconfig $my_if | awk '/inet6 / { print $3 } '
-        /sbin/ifconfig $my_if | awk '/TX b/ { print "TX " $3 $4 " RX " $7 $8 } '
-    done
-echo
-LANG=$O_LANG
-LC_ALL=$O_LC_ALL
+  echo -e "\n${nocolor}You are logged in to ${light_red}${HOST}${nocolor} - $(date)"
+  echo -e "\n${light_red}Kernel version:${nocolor} " ; uname -a
+  echo -e "\n${light_red}Users logged on:${nocolor} " ; w -h
+  echo -e "\n${light_red}Machine stats :${nocolor} " ; uptime
+  echo -e "\n${light_red}Memory stats :${nocolor} " ; free -m
+  echo -e "\n${light_red}Disk stats :${nocolor} " ; df -h
+
+  for my_if in $MY_IFS; do
+    echo -e "\n${light_red}Interface $my_if :${nocolor}"
+    if command -v ifconfig >/dev/null 2>&1; then
+      /sbin/ifconfig $my_if | awk '/inet / { print $2 } ' | cut -d ":" -f 2
+      /sbin/ifconfig $my_if | awk '/inet6 / { print $3 } '
+      /sbin/ifconfig $my_if | awk '/TX b/ { print "TX " $3 $4 " RX " $7 $8 } '
+    else
+      ip addr show $my_if | awk '/inet / { print $2 }'
+      ip -6 addr show $my_if | awk '/inet6 / { print $2 }'
+      ip -s link show $my_if | awk '/RX/ { print "TX " $2 $3 " RX " $6 $7 }'
+    fi
+  done
+
+  echo
+  LANG=$O_LANG
+  LC_ALL=$O_LC_ALL
 }
