@@ -29,7 +29,6 @@ alias ls='ls $LS_OPTIONS'
 alias ll='ls $LS_OPTIONS -l'
 alias l='ls $LS_OPTIONS -lA'
 alias ip='ip $LS_OPTIONS'
-alias diff='diff $LS_OPTIONS'
 
 ## aliases to avoid making mistakes:
 alias rm='rm -i'
@@ -42,6 +41,7 @@ alias cd..='cd ..'
 alias ..='cd ..'
 alias ...='cd ../..'
 alias cls='clear'
+alias diff='diff -u'
 alias g="git"
 alias h='history'
 alias df='df -h'
