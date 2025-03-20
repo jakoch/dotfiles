@@ -26,8 +26,8 @@ export COMMAND_NOT_FOUND_INSTALL_PROMPT=1
 export LS_OPTIONS='--color=auto --human'
 eval "`dircolors`"
 alias ls='ls $LS_OPTIONS'
-alias ll='ls $LS_OPTIONS -l'
-alias l='ls $LS_OPTIONS -lA'
+alias l='ls $LS_OPTIONS -hFtr'
+alias ll='ls $LS_OPTIONS -lAhFtr'
 alias ip='ip $LS_OPTIONS'
 
 ## aliases to avoid making mistakes:
