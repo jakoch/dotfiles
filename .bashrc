@@ -117,7 +117,7 @@ shopt -s "${_shopts[@]}"; unset _shopts
 # Autocomplete for alias 'g' (git)
 complete -o default -o nospace -F _git g
 # Autocompletion for git
-source ~/git-completion/git-completion.bash
+source ~/dotfiles/git-completion/git-completion.bash
 # Github CLI
 [[ -x $( command -v gh ) ]] && eval "$( gh completion -s bash )"
 
