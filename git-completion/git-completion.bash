@@ -13,7 +13,8 @@
 #    *) git email aliases for git-send-email
 #    *) tree paths within 'ref:path/to/file' expressions
 #    *) file paths within current working directory and index
-#    *) common --long-options
+#    *) common --long-options but not single-letter options
+#    *) arguments to long and single-letter options
 #
 # To use these routines:
 #
@@ -232,6 +233,17 @@ __git_dequote ()
 			;;
 		esac
 	done
+}
+
+# Prints the number of slash-separated components in a path.
+# 1: Path to count components of.
+__git_count_path_components ()
+{
+	local path="$1"
+	local relative="${path#/}"
+	relative="${relative%/}"
+	local slashes="/${relative//[^\/]}"
+	echo "${#slashes}"
 }
 
 # The following function is based on code from:
@@ -779,16 +791,39 @@ __git_tags ()
 __git_dwim_remote_heads ()
 {
 	local pfx="${1-}" cur_="${2-}" sfx="${3-}"
-	local fer_pfx="${pfx//\%/%%}" # "escape" for-each-ref format specifiers
 
 	# employ the heuristic used by git checkout and git switch
 	# Try to find a remote branch that cur_es the completion word
 	# but only output if the branch name is unique
-	__git for-each-ref --format="$fer_pfx%(refname:strip=3)$sfx" \
-		--sort="refname:strip=3" \
-		${GIT_COMPLETION_IGNORE_CASE+--ignore-case} \
-		"refs/remotes/*/$cur_*" "refs/remotes/*/$cur_*/**" | \
-	uniq -u
+	local awk_script='
+	function casemap(s) {
+		if (ENVIRON["IGNORE_CASE"])
+			return tolower(s)
+		else
+			return s
+	}
+	BEGIN {
+		split(ENVIRON["REMOTES"], remotes, /\n/)
+		for (i in remotes)
+			remotes[i] = "refs/remotes/" casemap(remotes[i])
+		cur_ = casemap(ENVIRON["CUR_"])
+	}
+	{
+		ref_case = casemap($0)
+		for (i in remotes) {
+			if (index(ref_case, remotes[i] "/" cur_) == 1) {
+				branch = substr($0, length(remotes[i] "/") + 1)
+				print ENVIRON["PFX"] branch ENVIRON["SFX"]
+				break
+			}
+		}
+	}
+	'
+	__git for-each-ref --format='%(refname)' refs/remotes/ |
+		PFX="$pfx" SFX="$sfx" CUR_="$cur_" \
+			IGNORE_CASE=${GIT_COMPLETION_IGNORE_CASE+1} \
+			REMOTES="$(__git_remotes | sort -r)" awk "$awk_script" |
+		sort | uniq -u
 }
 
 # Lists refs from the local (by default) or from a remote repository.
@@ -894,7 +929,8 @@ __git_refs ()
 			case "HEAD" in
 			$match*|$umatch*)	echo "${pfx}HEAD$sfx" ;;
 			esac
-			__git for-each-ref --format="$fer_pfx%(refname:strip=3)$sfx" \
+			local strip="$(__git_count_path_components "refs/remotes/$remote")"
+			__git for-each-ref --format="$fer_pfx%(refname:strip=$strip)$sfx" \
 				${GIT_COMPLETION_IGNORE_CASE+--ignore-case} \
 				"refs/remotes/$remote/$match*" \
 				"refs/remotes/$remote/$match*/**"
@@ -2183,7 +2219,7 @@ __git_log_gitk_options="
 "
 # Options that go well for log and shortlog (not gitk)
 __git_log_shortlog_options="
-	--author= --committer= --grep=
+	--author= --grep= --exclude=
 	--all-match --invert-grep
 "
 # Options accepted by log and show
@@ -2261,6 +2297,7 @@ __git_complete_log_opts ()
 			$__git_log_shortlog_options
 			$__git_log_gitk_options
 			$__git_log_show_options
+			--committer=
 			--root --topo-order --date-order --reverse
 			--follow --full-diff
 			--abbrev-commit --no-abbrev-commit --abbrev=
@@ -3194,7 +3231,7 @@ _git_shortlog ()
 		__gitcomp "
 			$__git_log_common_options
 			$__git_log_shortlog_options
-			--numbered --summary --email
+			--committer --numbered --summary --email
 			"
 		return
 		;;
@@ -3428,7 +3465,7 @@ _git_sparse_checkout ()
 
 _git_stash ()
 {
-	local subcommands='push list show apply clear drop pop create branch'
+	local subcommands='push list show apply clear drop pop create branch import export'
 	local subcommand="$(__git_find_on_cmdline "$subcommands save")"
 
 	if [ -z "$subcommand" ]; then
@@ -3454,6 +3491,9 @@ _git_stash ()
 	show,--*)
 		__gitcomp_builtin stash_show "$__git_diff_common_options"
 		;;
+	export,--*)
+		__gitcomp_builtin stash_export "--print --to-ref"
+		;;
 	*,--*)
 		__gitcomp_builtin "stash_$subcommand"
 		;;
@@ -3465,7 +3505,10 @@ _git_stash ()
 					| sed -n -e 's/:.*//p')"
 		fi
 		;;
-	show,*|apply,*|drop,*|pop,*)
+	import,*)
+		__git_complete_refs
+		;;
+	show,*|apply,*|drop,*|pop,*|export,*)
 		__gitcomp_nl "$(__git stash list \
 				| sed -n -e 's/:.*//p')"
 		;;
