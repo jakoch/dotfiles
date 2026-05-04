@@ -18,8 +18,8 @@ jobs:
       # downloading to /opt so that the workspace folder remains clean
       - name: LINT all workflows using rhysd/actionlint
         run: |
-          sudo curl -Lo /opt/actionlint_1.7.7_linux_amd64.tar.gz https://github.com/rhysd/actionlint/releases/download/v1.7.7/actionlint_1.7.7_linux_amd64.tar.gz
-          sudo tar -xzvf /opt/actionlint_1.7.7_linux_amd64.tar.gz -C /opt
+          sudo curl -Lo /opt/actionlint_1.7.12_linux_amd64.tar.gz https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_linux_amd64.tar.gz
+          sudo tar -xzvf /opt/actionlint_1.7.12_linux_amd64.tar.gz -C /opt
           sudo chmod +x /opt/actionlint
           /opt/actionlint -version
           /opt/actionlint -debug
@@ -81,8 +81,8 @@ jobs:
 
       - name: LINT .editorconfig
         run: |
-          curl -LO https://github.com/editorconfig-checker/editorconfig-checker/releases/download/v3.2.0/editorconfig-checker_3.2.0_linux_amd64.deb
-          sudo dpkg -i editorconfig-checker_3.2.0_linux_amd64.deb
+          curl -LO https://github.com/editorconfig-checker/editorconfig-checker/releases/download/v3.6.1/editorconfig-checker_3.6.1_linux_amd64.deb
+          sudo dpkg -i editorconfig-checker_3.6.1_linux_amd64.deb
           sudo apt-get -f install
           editorconfig-checker
 

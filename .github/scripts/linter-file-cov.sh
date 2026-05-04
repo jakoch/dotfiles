@@ -24,7 +24,7 @@ fi
 ALL_FILES=()
 while IFS= read -r -d '' file; do
     ALL_FILES+=("$file")
-done < <(find . -type f -not \( -path './.git/*' -o -path './.fonts/*' -o -path './git-completion/*' -o -path './windows/*' -o -name '*.png' -o -name '*.md' \) -print0)
+done < <(find . -type f -not \( -path './.git/*' -o -path './.fonts/*'  -o -path './coding-tools/*' -o -path './git-completion/*' -o -path './windows/*' -o -name '*.png' -o -name '*.md' \) -print0)
 
 # Verify that ALL_FILES is populated
 #echo "=== ALL_FILES ==="

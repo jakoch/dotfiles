@@ -176,3 +176,15 @@ echo
 LANG=$O_LANG
 LC_ALL=$O_LC_ALL
 }
+
+##########################################
+## Coding Tools Setup
+##
+
+setup_opencode() {
+    /workspaces/dotfiles/coding-tools/install_opencode.sh
+}
+
+setup_mistral_vibe() {
+    /workspaces/dotfiles/coding-tools/install_mistral_vibe.sh
+}
