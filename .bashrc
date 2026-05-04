@@ -23,12 +23,13 @@ export COMMAND_NOT_FOUND_INSTALL_PROMPT=1
 ##
 
 # colorized shortcuts
-export LS_OPTIONS='--color=auto --human'
+export LS_OPTIONS='--color=auto'
 eval "`dircolors`"
 alias ls='ls $LS_OPTIONS'
+alias la='ls $LS_OPTIONS -A'
 alias l='ls $LS_OPTIONS -hFtr'
 alias ll='ls $LS_OPTIONS -lAhFtr'
-alias ip='ip $LS_OPTIONS'
+alias ip='ip -c'
 
 ## aliases to avoid making mistakes:
 alias rm='rm -i'
@@ -36,7 +37,12 @@ alias cp='cp -i'
 alias mv='mv -i'
 
 ## alias to be a bit faster:
-alias c="tr -d '\n' | pbcopy"        # Trim new lines and copy to clipboard
+# clipboard copy (Linux only, no macOS pbcopy)
+if command -v xclip >/dev/null 2>&1; then
+    alias c="tr -d '\n' | xclip -selection clipboard"
+elif command -v wl-copy >/dev/null 2>&1; then
+    alias c="tr -d '\n' | wl-copy"
+fi
 alias cd..='cd ..'
 alias ..='cd ..'
 alias ...='cd ../..'
@@ -46,10 +52,16 @@ alias g="git"
 alias h='history'
 alias df='df -h'
 alias du='du -h'
-alias dum='du --max-depth=1'
+alias dum='du --max-depth=1 | sort -h'
 alias grep='grep --color=always'
+alias grepc='grep --color=always -C 3'
 alias grepnc='grep --color=none'
-alias px='ps aux|grep'
+
+alias rgc='rg --context 3'
+# fuzzy search file content with preview
+alias rgpreview='rg --files | fzf --preview "rg --color=always {}"'
+
+alias px='ps aux | grep -v grep | grep'
 alias utc='date -u "+%Y-%m-%dT%H:%MZ"'
 alias wget='wget -c'
 
@@ -66,7 +78,10 @@ alias service="sudo service"
 alias topcpu='ps -eo pcpu,pmem,pid,user,args | sort -k 1 -r | head -10'
 
 # show open ports
-alias local_ports='sudo nmap -sT -O localhost'
+alias local_ports='ss -tuln'
+
+# show open ports with process names
+alias local_ports_p='ss -tulnp'
 
 ##########################################
 ## Settings
@@ -190,9 +205,9 @@ function ii() {
 ##
 
 setup_opencode() {
-    /workspaces/dotfiles/coding-tools/install_opencode.sh
+    ~/dotfiles/coding-tools/install_opencode.sh
 }
 
 setup_mistral_vibe() {
-    /workspaces/dotfiles/coding-tools/install_mistral_vibe.sh
+    ~/dotfiles/coding-tools/install_mistral_vibe.sh
 }
