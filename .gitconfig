@@ -144,6 +144,15 @@
   trustctime = false
   precomposeunicode = false
 
+  pager=delta
+
+[interactive]
+  diffFilter = delta --color-only
+
+[delta]
+  navigate = true  # use n and N to move between diff sections
+  dark = true      # or light = true, or omit for auto-detection
+
 [apply]
   # when applying a patch, strip whitespaces out
   whitespace = fix
@@ -183,7 +192,7 @@
 [merge]
   tool = diffuse
   # Show the common ancestor for merge conflicts.
-  conflictstyle = diff3
+  conflictstyle = zdiff3
 
 [rebase]
   # When doing an interactive rebase, automatically reorder and set the right
