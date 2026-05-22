@@ -1,0 +1,3 @@
+# disable everything shellcheck is finding.
+# all of these are upstream issues.
+disable=SC2059,SC2221,SC2222,SC2295,SC2154,SC2155,SC2148,SC2034
