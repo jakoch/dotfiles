@@ -1,0 +1,225 @@
+name: Lint
+
+on: [push, pull_request]
+
+jobs:
+  lint:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: 🤘 Checkout Code
+        uses: actions/checkout@v7 # https://github.com/actions/checkout
+
+      - name: Install tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y shellcheck dos2unix jq curl wget aria2 gdb git zsh i3-wm
+
+      # LINT .github/workflows/lint.yml
+      # downloading to /opt so that the workspace folder remains clean
+      # Release assets are verified against the upstream checksums file before use:
+      # an unverified asset is extracted as root in CI.
+      - name: LINT all workflows using rhysd/actionlint
+        env:
+          ACTIONLINT_VERSION: v1.7.12
+        run: |
+          set -euo pipefail
+          base="https://github.com/rhysd/actionlint/releases/download/${ACTIONLINT_VERSION}"
+          asset="actionlint_$(printf '%s' "${ACTIONLINT_VERSION#v}" | tr -d '[:space:]')_linux_amd64.tar.gz"
+          checksums="actionlint_$(printf '%s' "${ACTIONLINT_VERSION#v}")_checksums.txt"
+
+          curl -fsSLo "/opt/${asset}" "${base}/${asset}"
+          curl -fsSLo "/opt/${checksums}" "${base}/${checksums}"
+
+          # on bump: grep " ${asset}$" /opt/${checksums}
+          expected_sha256="8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8"
+          actual_sha256="$(sha256sum "/opt/${asset}" | cut -d' ' -f1)"
+          if [ "${actual_sha256}" != "${expected_sha256}" ]; then
+            echo "❌ ${asset} checksum mismatch:"
+            echo "   expected ${expected_sha256}"
+            echo "   actual   ${actual_sha256}"
+            exit 1
+          fi
+          echo "✅ ${asset} checksum verified"
+
+          sudo tar -xzf "/opt/${asset}" -C /opt actionlint
+          sudo chmod +x /opt/actionlint
+          /opt/actionlint -version
+          /opt/actionlint -color
+
+      - name: Set locale
+        run: |
+          export LC_ALL=C.UTF-8
+          export LANG=C.UTF-8
+          export LANGUAGE=C.UTF-8
+
+      - name: COMMON Lint line endings (show files with DOS LE and EOL errors)
+        run: |
+          find . -name '*.*' -print0 | xargs -0 dos2unix -e -ic
+
+      - name: COMMON Lint shell scripts
+        run: |
+          find . -name "*.sh" -print0 | xargs -0 shellcheck
+
+      - name: LINT .devcontainer/devcontainer.json
+        run: |
+          sed 's/\/\/.*//' .devcontainer/devcontainer.json | jq . > /dev/null
+
+      # LINT .i3/config
+      # `i3 -C` rather than i3-validate: i3-validate is not in Debian's i3-wm package,
+      # but -C is the same check. It rejects unknown directives and malformed tokens;
+      # it does not catch unbalanced braces or unknown command names.
+      - name: LINT .i3/config
+        run: |
+          i3 -C -c .i3/config
+
+      # LINT .i3/i3exit.sh
+      # LINT .i3/wallpaper.sh
+      # LINT .i3/i3status.conf is this yaml? i dont know how to lint it
+      - name: LINT .i3 folder
+        run: |
+          shellcheck .i3/*.sh
+
+      - name: LINT .jq/colors.jq
+        run: |
+          echo '{"test": "✅ this should be green and bold"}' | jq -L .jq -r 'import "colors" as c; c::bold(c::green(.test))'
+
+      #- name: LINT windows folder
+      #  run: |
+      #    shellcheck windows/setup.bat
+
+      - name: LINT .aria2.conf
+        run: |
+          aria2c --conf-path .aria2.conf --dry-run "https://raw.githubusercontent.com/jakoch/dotfiles/refs/heads/main/README.md"
+
+      - name: LINT .bash_profile
+        run: |
+          bash -n .bash_profile
+          shellcheck -s bash .bash_profile
+
+      - name: LINT .bashrc
+        run: |
+          bash -n .bashrc
+          shellcheck -s bash .bashrc
+
+      # LINT .zshrc
+      # parsed with `zsh -n` below -- shellcheck has no zsh support, so `shellcheck -s bash`
+      # only proved it was not valid bash
+
+      - name: LINT shell/common.sh
+        run: |
+          shellcheck -s bash shell/common.sh
+
+      - name: PARSE .zshrc with zsh
+        run: |
+          zsh -n .zshrc
+
+      - name: LINT .curlrc
+        run: |
+          curl --config .curlrc --output /dev/null "https://raw.githubusercontent.com/jakoch/dotfiles/refs/heads/main/README.md"
+
+      - name: LINT .dircolors
+        run: |
+          dircolors --print-ls-colors .dircolors
+
+      - name: LINT .editorconfig
+        env:
+          EC_VERSION: 3.6.1
+        run: |
+          set -euo pipefail
+          asset="editorconfig-checker_${EC_VERSION}_linux_amd64.deb"
+          base="https://github.com/editorconfig-checker/editorconfig-checker/releases/download/v${EC_VERSION}"
+          mkdir -p /opt/editorconfig-checker && cd /opt/editorconfig-checker
+
+          curl -fsSLo "$asset" "${base}/${asset}"
+          curl -fsSLo checksums.txt "${base}/checksums.txt"
+
+          # on bump: grep " ${asset}$" checksums.txt
+          expected_sha256="9cf7cc64529d8b9d5967a9ecab5232e7c58b47e37ab986acf8958ed1e7def8a5"
+          actual_sha256="$(sha256sum "$asset" | cut -d' ' -f1)"
+          if [ "${actual_sha256}" != "${expected_sha256}" ]; then
+            echo "❌ ${asset} checksum mismatch:"
+            echo "   expected ${expected_sha256}"
+            echo "   actual   ${actual_sha256}"
+            exit 1
+          fi
+          echo "✅ ${asset} checksum verified"
+
+          sudo dpkg -i "$asset"
+          sudo apt-get -f install -y
+          editorconfig-checker
+
+      - name: LINT .editorconfig-checker.json
+        run: |
+          sed 's/\/\/.*//' .editorconfig-checker.json | jq . > /dev/null
+
+      - name: LINT .fehbg
+        run: |
+          shellcheck -s sh .fehbg
+
+      - name: LINT .gdbinit
+        run: |
+          gdb -nx -q -x .gdbinit
+
+      - name: LINT .gitconfig
+        run: |
+          git config --file .gitconfig --name-only --list
+
+      # LINT .gitattributes -- asserts the export-ignore rule actually resolves, which
+      # `check-attr --all` did not: it succeeds for any file, valid rules or not.
+      - name: LINT .gitattributes
+        run: |
+          git check-attr export-ignore -- .gitignore |
+            grep -qx '.gitignore: export-ignore: set'
+
+      - name: LINT .icons
+        run: |
+          shellcheck .icons
+
+      - name: LINT .profile
+        run: |
+          shellcheck -s sh .profile
+
+      # Leading spaces are meaningless in these flat single-line config formats. Scoped
+      # deliberately: they are load-bearing in .bashrc/.gitconfig/... (indented shell
+      # arrays, nested git config), so do not add those files here. grep -n reports the
+      # offending lines; the loop accumulates so every failure shows in one run. The
+      # explicit -r test is needed because a missing file's grep error would otherwise
+      # read as "no match" and pass silently.
+      # LINT .gitignore .htoprc .inputrc .minttyrc .screenrc .selected_editor .tmux.conf .wgetrc
+      - name: CHECK leading spaces in dotfiles
+        run: |
+          files=".gitignore .htoprc .inputrc .minttyrc
+          .screenrc .selected_editor .tmux.conf .wgetrc"
+          rc=0
+          for f in $files; do
+            if [ ! -r "$f" ]; then
+              echo "❌ cannot read $f"
+              rc=1
+            elif grep -n '^[[:space:]]' "$f"; then
+              echo "❌ leading spaces in $f"
+              rc=1
+            fi
+          done
+          exit $rc
+
+      # LINT .ripgreprc -- rg has no config-validation flag, so there is nothing to
+      # assert here; the file is covered by manual review.
+
+      - name: LINT .wgetrc
+        run: |
+          wget --config .wgetrc --spider "https://raw.githubusercontent.com/jakoch/dotfiles/refs/heads/main/README.md"
+
+      - name: LINT .xinitrc
+        run: |
+          shellcheck .xinitrc
+
+      # LINT .Xresources -- a comment must be `! text`, not `!text`; xrdb reads the
+      # latter as a resource specification rather than a comment. Negated because grep
+      # exits 1 on no match, and no match is the good outcome here.
+      - name: CHECK .Xresources comment style
+        run: |
+          ! grep -n '^[^[:space:]]*![^[:space:]]' .Xresources
+
+      - name: LINT linter-file-cov.sh
+        run: |
+          shellcheck .github/scripts/linter-file-cov.sh

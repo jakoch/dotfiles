@@ -1,0 +1,246 @@
+#
+# Git Config File
+#
+# http://www.kernel.org/pub/software/scm/git/docs/git-config.html
+
+[user]
+  name = Jens A. Koch
+  email = jakoch@web.de
+
+[github]
+  user = jakoch
+  token = @token@
+
+[alias]
+  a  = commit --amend
+  br = branch
+  c  = commit
+  co = checkout
+  cp = cherry-pick
+  cps = cherry-pick -s
+  d   = diff
+  dc  = diff --cached
+  s  = status
+
+  # Stash control commands
+  drop = stash drop
+  list = stash list
+
+  # Amend the currently staged files to the latest commit
+  amend = commit --amend --reuse-message=HEAD
+
+  # Commit all changes
+  ca = !git add -A && git commit -av
+
+  # Remove branches that have already been merged with master (delete merged braches)
+  dm = "!git branch --merged | grep -v '\\*' | xargs -n 1 git branch -d"
+
+  # Switch to a branch, creating it if necessary
+  go = "!f() { git checkout -b \"$1\" 2> /dev/null || git checkout \"$1\"; }; f"
+
+  # Pull in remote changes for the current repository and all its submodules
+  p = !"git pull; git submodule foreach git pull origin main"
+
+  # Fetches a Pull Request by number into own branch named "pr-$NUMBER"
+  pr = "!f() { git fetch origin pull/$1/head:pr-$1 && git checkout pr-$1; }; f"
+
+  # Rebase interactive
+  rbi = rebase -i
+
+  # Interactive rebase with the given number of latest commits
+  reb = "!f() { git rebase -i HEAD~$1; }; f"
+
+  # Remove the old tag with this name and tag the latest commit with it.
+  retag = "!f() { git tag -d $1 && git push origin :refs/tags/$1 && git tag $1; }; f"
+
+  # Undo `git push`
+  undopush = push -f origin HEAD^:main
+
+  # Show verbose output about tags, branches or remotes
+  tags = tag -l
+  branches = branch -a
+  remotes = remote -v
+
+  # enhanced log view
+  lg1 = log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(auto)%d%C(reset)' --all
+  lg2 = log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset)%C(auto)%d%C(reset)%n''          %C(white)%s%C(reset) %C(dim white)- %an%C(reset)'
+  lg = lg1
+
+  # show users which have commits in current branch
+  userlist = "!git log --format='%aN' | sort -u"
+
+  # same as userlist, but with commit count
+  usercount = "!git log --format='%aN <%aE>' | awk '{arr[$0]++} END{for (i in arr){print arr[i], i;}}' | sort -nr"
+
+  # List contributors with number of commits
+  contributors = shortlog --summary --numbered
+
+  # Show Git log with raw diffs, skipping merges
+  w = log --diff-merges=off --name-only --pretty=short
+
+  # When used after a pull, shows all new commits from old to new.
+  # Optionally takes the branch name.
+  whatsnew = !git hist --no-merges --reverse $1@{1}..$1@{0}
+
+  # Merge GitHub pull request on top of the current branch
+  # or on top of a specified branch
+  mergepr = "!f() { \
+      declare currentBranch=\"$(git symbolic-ref --short HEAD)\"; \
+      declare branch=\"${2:-$currentBranch}\"; \
+      if [ $(printf \"%s\" \"$1\" | grep '^[0-9]\\+$' > /dev/null; printf $?) -eq 0 ]; then \
+          git fetch origin refs/pull/$1/head:pr/$1 && \
+          git checkout -B $branch && \
+          git rebase $branch pr/$1 && \
+          git checkout -B $branch && \
+          git merge pr/$1 && \
+          git branch -D pr/$1 && \
+          git commit --amend -m \"$(git log -1 --pretty=%B)\n\nClose #$1\"; \
+      fi \
+  }; f"
+
+  # List remote branches
+  lrb = "!f() { \
+    remote="${1:-origin}"; \
+    git ls-remote --heads "$remote"; \
+  }; f"
+
+  # Show commit history as a graph with decorations and a compact format
+  graph = log --all --graph --oneline --decorate
+
+  # Continuously monitor Git graph, diff, or status with color
+  continuous-graph = "!watch -tc 'git -c color.ui=always graph | grep -A 60 -B 30 36mHEAD'"
+  continuous-diff = "!watch -tc 'git -c color.ui=always diff'"
+  continuous-status = "!watch -tc 'git -c color.ui=always status'"
+
+  # Perform an interactive-like rebase one commit at a time
+  slowrebase = "!bash -c 'for i in $(git rev-list --reverse $(git merge-base HEAD @{u})..@{u}); do git rebase $i || break; done'"
+
+  # stepwise rebase with single commit, 10 commits, 25 commits
+  steprebase = "!bash -c 'git rebase $(git rev-list --reverse $(git merge-base HEAD @{u})..@{u} | head -1)'"
+  steprebase10 = "!bash -c 'git rebase $(git rev-list --reverse $(git merge-base HEAD @{u})..@{u} | head -10 | tail -1)'"
+  steprebase25 = "!bash -c 'git rebase $(git rev-list --reverse $(git merge-base HEAD @{u})..@{u} | head -25 | tail -1)'"
+
+# always set `origin` as the default remote on the `main` branch
+[branch "main"]
+  remote = origin
+  merge = refs/heads/main
+  rebase = true
+
+[branch]
+  autosetupmerge = true
+
+[push]
+  default = simple
+
+[format]
+  pretty = %Cblue%h%Creset %Cgreen[%ar]%Creset (%an) %s
+
+# anti whitespace / anti tab
+[core]
+  # enforce "trailing-spaces" and "mixing spaces with tabs" as errors
+  # To get rid of trailing whitespace on all files in the current directory, use: sed -i 's/[[:space:]]*$//' *
+  whitespace =  trailing-space,space-before-tab,cr-at-eol,tab-in-indent
+
+  trustctime = false
+  precomposeunicode = false
+
+  pager=delta
+
+[interactive]
+  diffFilter = delta --color-only
+
+[delta]
+  navigate = true  # use n and N to move between diff sections
+  dark = true      # or light = true, or omit for auto-detection
+
+[apply]
+  # when applying a patch, strip whitespaces out
+  whitespace = fix
+
+# URL replacements
+
+[url "git@github.com:"]
+  insteadOf = "gh:"
+  pushInsteadOf = "github:"
+  pushInsteadOf = "git://github.com/"
+
+[url "git://github.com/"]
+  insteadOf = "github:"
+
+[url "git@gist.github.com:"]
+  insteadOf = "gst:"
+  pushInsteadOf = "gist:"
+  pushInsteadOf = "git://gist.github.com/"
+
+[url "git://gist.github.com/"]
+  insteadOf = "gist:"
+
+[transfer]
+  # Verify new objects to catch errors early.
+  # This is to prevent bad objects from spreading further.
+  fsckObjects = true
+
+[diff]
+  # Try harder to produce a clean diff.
+  # The "histogram" algorithm is an extension of the "patience" algorithm.
+  # It is faster than "patience" and the default "diff" algorithm.
+  algorithm = histogram
+
+  # Try to break up diffs at blank lines, so that brackets don't float away.
+  compactionHeuristic = true
+
+[merge]
+  tool = delta
+  # Show the common ancestor for merge conflicts.
+  conflictstyle = zdiff3
+
+[rebase]
+  # When doing an interactive rebase, automatically reorder and set the right
+  # actions for commits that were committed with --fixup or --squash.
+  autosquash = true
+
+[rerere]
+  # Remember conflict resolutions.
+  # If the same conflict appears again, use the previous resolution.
+  enabled = true
+
+  # If rerere successfully resolved a conflict, stage the conflicted file automatically.
+  autoupdate = true
+
+[init]
+  defaultBranch = main
+
+[advice]
+  skippedCherryPicks = false
+
+#
+# GUI style related settings
+#
+
+[gui]
+  fontdiff = -family Consolas -size 10 -weight normal -slant roman -underline 0 -overstrike 0
+  diffcontext = 4
+  encoding = utf-8
+
+[color]
+  diff = auto
+  branch = auto
+  status = auto
+  interactive = auto
+  ui = auto
+  pager = true
+
+[color "branch"]
+  current = red
+  remote = green
+
+[color "diff"]
+  meta = yellow bold
+  frag = magenta bold
+  old = red bold
+  new = green bold
+
+[color "status"]
+  added = yellow
+  changed = green
+  untracked = red
